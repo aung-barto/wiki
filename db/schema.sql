@@ -1,0 +1,37 @@
+DROP TABLE IF EXISTS articles;
+CREATE TABLE articles (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+title TEXT,
+content TEXT,
+image TEXT,
+author_id INTEGER,
+create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+DROP TABLE IF EXISTS users;
+CREATE TABLE users (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+name TEXT,
+email TEXT,
+location TEXT
+);
+
+DROP TABLE IF EXISTS co_authors;
+CREATE TABLE co_authors (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+article_id INTEGER,
+user_id INTEGER,
+content TEXT,
+comment TEXT,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TRIGGER timestamp_update BEFORE UPDATE ON co_authors BEGIN UPDATE co_authors SET updated_at = CURRENT_TIMESTAMP WHERE id = new.id;
+END;
+
+DROP TABLE IF EXISTS subscribers;
+CREATE TABLE subscribers (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+article_id INTEGER,
+user_id INTEGER
+);

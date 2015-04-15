@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Wikifoodies</title>
+	<a href="/article/new">Create New Article</a>
+	<a href="/user/new">Create New User</a>
+	<form method="GET" action="/article/<% articles.id %>">
+		<input type="text" name="title" placeholder="Search by title" required>
+		<button>Search</button>
+	</form>
+	<h1>Wikifoodies</h1>
+</head>
+<body> 
+	<% articles.forEach(function(art_obj){ %>
+		<h2><%= art_obj.title %></h2>
+
+	<% authors.forEach(function(aut_obj){ %>
+		<p>By: <%= aut_obj.name %></p>
+	<% }); %>
+		<p><%= art_obj.create_at %></p>
+		<p><%= art_obj.content.substring(0,100) %></p>
+		<a href="/article/<% art_obj.id %>">Read More</a>
+	<% }); %>
+</body>
+</html>
