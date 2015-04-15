@@ -23,11 +23,12 @@ app.get("/wiki", function(req,res){
 		}else{
 			var all_articles = data.reverse();
 			console.log(data);
-			db.all("SELECT users.name FROM articles INNER JOIN users ON articles.author_id = users.id;", function(err,data){
+			db.all("SELECT users.name, users.id FROM users;", function(err,data){
 				if(err){
 					console.log(err);
 				}else{
 					var all_authors = data.reverse();
+					console.log(all_authors);
 				}
 				res.render("index.ejs", {articles: all_articles, authors: all_authors});
 			});
@@ -44,7 +45,7 @@ app.get("/article/:id", function(req,res){
 		}else{
 			var thisArt = data;
 			//getting author of the article
-			db.get("SELECT users.name FROM users INNER JOIN articles ON articles.author_id = users.id WHERE articles.id = " + artID, function(err,data){
+			db.get("SELECT users.name, users.id FROM users INNER JOIN articles ON articles.author_id = users.id WHERE articles.id = " + artID, function(err,data){
 				if(err){
 					console.log(err);
 				}else{

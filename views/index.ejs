@@ -5,7 +5,7 @@
 	<title>Wikifoodies</title>
 	<a href="/article/new">Create New Article</a>
 	<a href="/user/new">Create New User</a>
-	<form method="GET" action="/article/<% articles.id %>">
+	<form method="GET" action="/article/<%= articles.id %>">
 		<input type="text" name="title" placeholder="Search by title" required>
 		<button>Search</button>
 	</form>
@@ -15,12 +15,15 @@
 	<% articles.forEach(function(art_obj){ %>
 		<h2><%= art_obj.title %></h2>
 
-	<% authors.forEach(function(aut_obj){ %>
-		<p>By: <%= aut_obj.name %></p>
-	<% }); %>
+		<% authors.forEach(function(aut_obj){ %>
+			<% if(art_obj.author_id === aut_obj.id){ %>
+				<a href="/user/<%= aut_obj.id %>">By: <%= aut_obj.name %></a> 
+			<% } %>
+		<% }); %>
+		
 		<p><%= art_obj.create_at %></p>
 		<img src="<%= art_obj.image %>">
-		<p><%= art_obj.content.substring(0,100) %></p>
+		<p><%= art_obj.content.substring(0,100) %>...</p>
 		<a href="/article/<%= art_obj.id %>">Read More</a>
 	<% }); %>
 </body>

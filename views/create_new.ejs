@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>New Article</title>
+	<nav>
+	<a href="/wiki">Home</a>
+	<a href="/user/new">Create New User</a>
+	</nav>
+	<h1>Wikifoodies</h1>
+</head>
+<body>
+	<h2>New Article:</h2>
+	<p>You must have a user profile before you can create a new article</p>
+	<form method="POST" action="/articles">
+		<label>Title:</label>
+		<input type="text" name="title" placeholder="Title" required></br>
+		<label>Content:</label>
+		<textarea name="content" placeholder="content" required></textarea></br>
+		<label>Image URL:</label>
+		<textarea name="image" placeholder="URL"></textarea></br>
+		<label>User Name:</label>
+		<% users.forEach(function(obj){ %>
+			<select name="user">
+			<option value="<%= users.id %>"><%= users.name %></option>
+			<% }) %>
+
+	<button>Submit</button>
+	</form>
+</body>
+</html>
