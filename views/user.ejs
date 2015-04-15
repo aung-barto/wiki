@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title><%= users.name %></title>
+	<nav>
+	<a href="/wiki">Home</a>
+	<a href="/article/new">Create New Article</a>
+	</nav>
+	<h1>Wikifoodies: User Profile</h1>
+</head>
+<body>
+	<h2><%= users.name %></h2>
+	<p><%= users.email %></p>
+	<p><%= users.location %></p>
+
+		<h4>Authorships:</h4>
+		<a href="/article/<%= authors.id %>"><%= authors.title %></a>
+
+	
+		<h4>Contributions:</h4>
+		<a href="/article/<%= co_authors.id %>"><%= co_authors.title%></a>
+		
+
+		<h4>Subscriptions:</h4>
+		<a href="/article/<%= subscribers.id %>"><%= subscribers.title %></a>
+
+</body>
+</html>

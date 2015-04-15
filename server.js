@@ -22,6 +22,7 @@ app.get("/wiki", function(req,res){
 			console.log(err);
 		}else{
 			var all_articles = data.reverse();
+			console.log(data);
 			db.all("SELECT users.name FROM articles INNER JOIN users ON articles.author_id = users.id;", function(err,data){
 				if(err){
 					console.log(err);
@@ -64,27 +65,47 @@ app.get("/article/:id", function(req,res){
 
 //go to user setup page
 app.get("/user/new", function(req,res){
-	//for title search 
-	db.get("SELECT * FROM articles WHERE title = '" + req.body.title + "'", function(err,data){
-		if(err){
-			console.log(err);
-		}else{
-			var thisTitle = data;
-		res.render("create_user.ejs", {articles:thisTitle});
-		}
-	});
+		res.render("create_user.ejs");
+
 });
 
 //create a new user and confirm
-app.post("/user", function(req,res){
+app.post("/users", function(req,res){
 	db.run("INSERT INTO users (name,email,location) VALUES(?,?,?);", req.body.name, req.body.email, req.body.location, function(err,data){
 		if(err){
 			console.log(err);
 		}else{
-			res.render("confirm_user.ejs"); //go to user confirmation page
+			var id = this.lastID;
+			res.redirect("/user/"+id); //go to user page
 		}
 	});
 });
+
+//user page
+app.get("/user/:id", function(req,res){
+	var userID = parseInt(req.params.id);
+	db.get("SELECT * FROM users WHERE id = " + userID, function(err,data){
+			thisUser = data;
+			console.log(thisUser);
+
+		//get authored articles
+		db.get("SELECT articles.title, articles.id FROM articles INNER JOIN users ON users.id = articles.author_id;", function(err,thisAuthor){
+				console.log(thisAuthor);
+
+			//get co-authored articles
+			db.get("SELECT articles.title, articles.id FROM articles INNER JOIN co_authors ON articles.id = co_authors.article_id;", function(err,thisCoAut){
+				console.log(thisCoAut);
+
+				//get subscribed articles
+				db.get("SELECT articles.title, articles.id FROM articles INNER JOIN subscribers ON articles.id = subscribers.article_id;", function(err,thisSub){
+					console.log(thisSub);
+					res.render("user.ejs", {users: thisUser, authors: thisAuthor, co_authors: thisCoAut, subscribers: thisSub});
+				});
+			});
+		});
+	});
+});
+
 
 app.listen("3000");
 console.log("Server listening to port 3000");
