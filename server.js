@@ -62,5 +62,29 @@ app.get("/article/:id", function(req,res){
 	});
 });
 
+//go to user setup page
+app.get("/user/new", function(req,res){
+	//for title search 
+	db.get("SELECT * FROM articles WHERE title = '" + req.body.title + "'", function(err,data){
+		if(err){
+			console.log(err);
+		}else{
+			var thisTitle = data;
+		res.render("create_user.ejs", {articles:thisTitle});
+		}
+	});
+});
+
+//create a new user and confirm
+app.post("/user", function(req,res){
+	db.run("INSERT INTO users (name,email,location) VALUES(?,?,?);", req.body.name, req.body.email, req.body.location, function(err,data){
+		if(err){
+			console.log(err);
+		}else{
+			res.render("confirm_user.ejs"); //go to user confirmation page
+		}
+	});
+});
+
 app.listen("3000");
 console.log("Server listening to port 3000");

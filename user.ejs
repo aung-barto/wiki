@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>New User</title>
+	<nav>
+	<a href="/wiki">Home</a>
+	<a href="/article/new">Create New Article</a>
+	<a href="/user/new">Create New User</a>
+	<form method="GET" action="/article/<%= articles.id %>">
+		<input type="text" name="title" placeholder="Search by title" required>
+		<button>Search</button>
+	</form>
+	</nav>
+	<h1>Wikifoodies: New User Setup</h1>
+</head>
