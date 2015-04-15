@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Wikifoodies</title>
+	<nav>
+	<a href="/wiki">Home</a>
+	<a href="/article/new">Create New Article</a>
+	<a href="/user/new">Create New User</a>
+	<form method="GET" action="/article/<%= articles.id %>">
+		<input type="text" name="title" placeholder="Search by title" required>
+		<button>Search</button>
+	</form>
+	</nav>
+	<h1>Wikifoodies</h1>
+</head>
+<body>
+	<h2><%= articles.title %></h2>
+	<div class="author">
+	<a href="/user/<%= users.id %>"><%= users.name %></a>
+	</div>
+
+	<div class="timestamp">
+	<a href="/article/<%=articles.id %>/history"><%= articles.create_at %></a>
+	</div>
+	<img src="<%= articles.image %>">
+	<p><%= articles.content %></p>
+
+	<div class="footer">
+	<a href="/subscribe">Subscribe to this article</a>
+	<a href="/article/<%= articles.id %>">Edit Article</a>
+	<form method="GET" action="/wiki?_method=DELETE">
+		<input type="checkbox" name="remove" required>
+	<button>Delete Article</button>
+	</form>
+	</div>
+</body>
+</html>

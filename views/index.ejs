@@ -19,8 +19,9 @@
 		<p>By: <%= aut_obj.name %></p>
 	<% }); %>
 		<p><%= art_obj.create_at %></p>
+		<img src="<%= art_obj.image %>">
 		<p><%= art_obj.content.substring(0,100) %></p>
-		<a href="/article/<% art_obj.id %>">Read More</a>
+		<a href="/article/<%= art_obj.id %>">Read More</a>
 	<% }); %>
 </body>
 </html>
