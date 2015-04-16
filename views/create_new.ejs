@@ -20,11 +20,11 @@
 		<label>Image URL:</label>
 		<textarea name="image" placeholder="URL"></textarea></br>
 		<label>User Name:</label>
-		<% users.forEach(function(obj){ %>
 			<select name="user">
-			<option value="<%= users.id %>"><%= users.name %></option>
-			<% }) %>
-
+			<% users.forEach(function(obj){ %>
+			<option value="<%= obj.id %>"><%= obj.name %></option>
+			<% }); %>
+			</select></br></br>
 	<button>Submit</button>
 	</form>
 </body>

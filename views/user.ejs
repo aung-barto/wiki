@@ -15,15 +15,9 @@
 	<p><%= users.location %></p>
 
 		<h4>Authorships:</h4>
-		<a href="/article/<%= authors.id %>"><%= authors.title %></a>
-
-	
-		<h4>Contributions:</h4>
-		<a href="/article/<%= co_authors.id %>"><%= co_authors.title%></a>
-		
-
-		<h4>Subscriptions:</h4>
-		<a href="/article/<%= subscribers.id %>"><%= subscribers.title %></a>
+		<% authors.forEach(function(obj){ %>
+			<a href="/article/<%= obj.id %>"><%= obj.title %></a>
+		<% }); %>
 
 </body>
 </html>

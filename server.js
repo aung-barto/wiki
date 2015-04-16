@@ -22,18 +22,26 @@ app.get("/wiki", function(req,res){
 			console.log(err);
 		}else{
 			var all_articles = data.reverse();
-			console.log(data);
+			// console.log(data);
 			db.all("SELECT users.name, users.id FROM users;", function(err,data){
 				if(err){
 					console.log(err);
 				}else{
 					var all_authors = data.reverse();
-					console.log(all_authors);
+					// console.log(all_authors);
 				}
 				res.render("index.ejs", {articles: all_articles, authors: all_authors});
 			});
 		}
 	});
+});
+
+//go to new article page
+app.get("/article/new", function(req,res){
+	db.all("SELECT * FROM users;", function(err,data){
+		res.render("create_new.ejs", {users: data});
+	});
+		
 });
 
 //show individual article
@@ -67,7 +75,6 @@ app.get("/article/:id", function(req,res){
 //go to user setup page
 app.get("/user/new", function(req,res){
 		res.render("create_user.ejs");
-
 });
 
 //create a new user and confirm
@@ -87,25 +94,36 @@ app.get("/user/:id", function(req,res){
 	var userID = parseInt(req.params.id);
 	db.get("SELECT * FROM users WHERE id = " + userID, function(err,data){
 			thisUser = data;
-			console.log(thisUser);
+			// console.log(thisUser);
 
 		//get authored articles
-		db.get("SELECT articles.title, articles.id FROM articles INNER JOIN users ON users.id = articles.author_id;", function(err,thisAuthor){
-				console.log(thisAuthor);
-
-			//get co-authored articles
-			db.get("SELECT articles.title, articles.id FROM articles INNER JOIN co_authors ON articles.id = co_authors.article_id;", function(err,thisCoAut){
-				console.log(thisCoAut);
-
-				//get subscribed articles
-				db.get("SELECT articles.title, articles.id FROM articles INNER JOIN subscribers ON articles.id = subscribers.article_id;", function(err,thisSub){
-					console.log(thisSub);
-					res.render("user.ejs", {users: thisUser, authors: thisAuthor, co_authors: thisCoAut, subscribers: thisSub});
-				});
-			});
+		db.all("SELECT articles.title, articles.id FROM articles WHERE author_id = " + userID, function(err,thisAuthor){
+			if(thisAuthor === undefined){
+				return "<p>No Entry</p>";
+				// console.log(thisAuthor);
+			}else{
+				res.render("user.ejs", {users: thisUser, authors: thisAuthor});
+			}
+			
+			// 	});
+			// });
 		});
 	});
 });
+
+
+
+// //create a new article and confirm
+// app.post("/articles", function(req,res){
+// 	db.run("INSERT INTO articles (title,content,image, author_id) VALUES(?,?,?,?);", req.body.title, req.body.content, req.body.image, req.body.author_id, function(err,data){
+// 		if(err){
+// 			console.log(err);
+// 		}else{
+// 			var id = this.lastID;
+// 			res.redirect("/article/"+id); //go to individual article page
+// 		}
+// 	});
+// });
 
 
 app.listen("3000");
