@@ -2,30 +2,27 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title><%= history.title %></title>
+	<% articles.forEach(function(artObj){ %>
+	<title><%= artObj.title %></title>	
+	
 	<nav>
 	<a href="/wiki">Home</a>
 	<a href="/article/new">Create New Article</a>
 	<a href="/user/new">Create New User</a>
-	<a href="/article/<%= history.article_id %>">Back to Main Article</a>
+	<a href="/article/<%= artObj.id %>">Back to Main Article</a>
 	</nav>
 	<h1>Wikifoodies</h1>
 </head>
 <body>
-	<h2><%= history.title %></h2>
-
-	<% users.forEach(function(userObj){ %>
-		<a href="/user/<%= userObj.id%>"><%= userObj.name %></a>
-		<% }); %>
-
-	<% history.forEach(function(obj){ %>
-		<p><%= obj.comment %></p>
-		<% }); %>
-
-		<% history.forEach(function(obj){ %>
-		<a href="<%= obj.id %>"><%= obj.updated_at %></a>
-		<% }); %>
-
+	<h2><%= artObj.title %></h2>
+	<% }); %>
+	<ul>
+	<% allUsers.forEach(function(obj){ %>
+		<li><a href="/user/<%= obj.user_id%>"><%= obj.name %></a></li>
+		<li><p><%= obj.comment %></p></li>
+		<li><a href="/article/<%= articles.article_id %>/<%= obj.id %>"><%= obj.updated_at %></a></li>
+	<% }); %>
+	</ul>
 </body>
 </html>
 		

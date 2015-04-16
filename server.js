@@ -130,17 +130,20 @@ app.put("/article/:id", function(req,res){
 //go to history of each article
 app.get("/article/:id/history", function(req,res){
 	var articleID = parseInt(req.params.id);
-	db.all("SELECT * FROM co_authors WHERE article_id = " + articleID, function(err,revisions){
-		if(err){console.log(err)}
-		console.log(revisions);
-	
-		db.all("SELECT users.name, users.id FROM co_authors INNER JOIN users ON co_authors.user_id = users.id WHERE co_authors.article_id = " + articleID, function(err,userData){
-			if(err){console.log(err)}
+	// db.all("SELECT * FROM co_authors WHERE article_id = " + articleID, function(err,revisions){
+	// 	if(err){console.log(err)}
+	// 	console.log(revisions);
 
-			db.all("SELECT * FROM articles WHERE id = " + articleID, function(err, artData){
+		db.all("SELECT users.name, users.id, co_authors.comment, co_authors.updated_at FROM co_authors INNER JOIN users ON co_authors.user_id = users.id WHERE co_authors.article_id = " + articleID, function(err,userData){
+			if(err){console.log(err)}
+			console.log(userData);
+
+			db.all("SELECT title, id FROM articles WHERE id = " + articleID, function(err, artData){
 				if(err){console.log(err)}
-				res.render("history.ejs", {history: revisions, users: userData, articles: artData});
-			});
+				console.log(artData);
+
+				res.render("history.ejs", {allUsers: userData, articles: artData});
+			// });
 		});
 	});
 });
