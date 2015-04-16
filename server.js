@@ -60,43 +60,33 @@ app.get("/article/new", function(req,res){
 
 //create a new article and confirm
 app.post("/articles", function(req,res){
-	db.run("INSERT INTO articles (title, content, image, author_id) VALUES(?,?,?,?);", req.body.title, req.body.content, req.body.image, req.body.author_id, function(err,data){
-		if(err){console.log(err)}else{
+	db.run("INSERT INTO articles (title, content, image, author_id) VALUES(?,?,?,?);", req.body.title, req.body.content, req.body.image, req.body.author_id, function(err,data1){
+		if(err){console.log(err);
+		}else{
 			var id = this.lastID;
+			db.run("INSERT INTO co_authors (article_id, user_id, content, image, comment) VALUES (?,?,?,?,?);", req.body.article_id, req.body.user_id, req.body.content, req.body.image, req.body.comment, function(err,data2){
+				if(err){console.log(err);
+				}else{
+					res.redirect("/article/"+id); //go to individual article page
+				}
+			});
 		}
-		res.redirect("/article/"+id); //go to individual article page
 	});
 });
 
 //show individual article
 app.get("/article/:id", function(req,res){
 	var artID = parseInt(req.params.id);
-	//If there's an updated version run this
-	db.get("SELECT * FROM co_authors WHERE article_id = " + artID, function(err,thisCo){
-		if(thisCo != undefined){
-			//getting author of the article
-			db.get("SELECT articles.title, articles.author_id, users.name FROM articles INNER JOIN users ON articles.author_id = users.id WHERE articles.id = " + artID, function(err,other){
+	db.get("SELECT * FROM articles WHERE id = " + artID, function(err,thisArt){
+	if(err){
+		console.log(err)
+	}else{
+		//getting author of the article
+		db.get("SELECT articles.author_id, users.name FROM articles INNER JOIN users ON articles.author_id = users.id WHERE articles.id = " + artID, function(err,other){
 				if(err){
-					console.log(err);
-				}else {
-					res.render("show.ejs", {articles: thisCo, info: other});
-				}
-			});		
-		}
-		//if no update, run the original
-		else if(thisCo === undefined){
-			db.get("SELECT * FROM articles WHERE id = " + artID, function(err,thisArt){
-			if(err){
-				console.log(err)
-			}else{
-				//getting author of the article
-				db.get("SELECT articles.title, articles.author_id, users.name FROM articles INNER JOIN users ON articles.author_id = users.id WHERE articles.id = " + artID, function(err,other){
-						if(err){
-							console.log(err)
-						}else{
-							res.render("show.ejs", {articles: thisArt, info: other});
-						}
-					});
+					console.log(err)
+				}else{
+					res.render("show.ejs", {articles: thisArt, info: other});
 				}
 			});
 		}
@@ -128,12 +118,30 @@ app.get("/article/:id/edit", function(req,res){
 //update article page
 app.put("/article/:id", function(req,res){
 	console.log(parseInt(req.params.id));
-	// db.run("UPDATE articles SET content = ?, image = ?, WHERE id = ?;",req.body.content, req.body.image, parseInt(req.params.id), function(err,data){
-	// 	console.log(req.body);
+	db.run("UPDATE articles SET content = ?, image = ?, WHERE id = ?;",req.body.content, req.body.image, parseInt(req.params.id), function(err,data){
+		console.log(req.body);
 		db.run("INSERT INTO co_authors(article_id, user_id, content, image, comment) VALUES(?,?,?,?,?);", req.body.article_id, req.body.user_id, req.body.content, req.body.image, req.body.comment, function(err,data){
 
 			res.redirect("/article/" + parseInt(req.params.id));
-		// });
+		});
+	});
+});
+
+//go to history of each article
+app.get("/article/:id/history", function(req,res){
+	var articleID = parseInt(req.params.id);
+	db.all("SELECT * FROM co_authors WHERE article_id = " + articleID, function(err,revisions){
+		if(err){console.log(err)}
+		console.log(revisions);
+	
+		db.all("SELECT users.name, users.id FROM co_authors INNER JOIN users ON co_authors.user_id = users.id WHERE co_authors.article_id = " + articleID, function(err,userData){
+			if(err){console.log(err)}
+
+			db.all("SELECT * FROM articles WHERE id = " + articleID, function(err, artData){
+				if(err){console.log(err)}
+				res.render("history.ejs", {history: revisions, users: userData, articles: artData});
+			});
+		});
 	});
 });
 
