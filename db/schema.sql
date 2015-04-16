@@ -22,6 +22,7 @@ id INTEGER PRIMARY KEY AUTOINCREMENT,
 article_id INTEGER,
 user_id INTEGER,
 content TEXT,
+image TEXT,
 comment TEXT,
 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

@@ -22,7 +22,7 @@
 		<label>User Name:</label>
 			<select name="author_id">
 			<% users.forEach(function(obj){ %>
-			<option value="<%= obj.id %>">"<%= obj.name %>"</option>
+			<option value="<%= obj.id %>"><%= obj.name %></option>
 			<% }); %>
 			</select></br></br>
 	<button>Submit</button>
