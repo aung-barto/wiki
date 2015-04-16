@@ -29,8 +29,8 @@
 	<div class="footer">
 	<a href="/subscribe">Subscribe to this article</a>
 	<a href="/article/<%= articles.id %>">Edit Article</a>
-	<form method="GET" action="/wiki?_method=DELETE">
-		<input type="checkbox" name="remove" required>
+	<form method="POST" action="/article/<%=articles.id %>?_method=DELETE">
+		<input type="checkbox" name="delete" value="delete" required>Confirm</input>
 	<button>Delete Article</button>
 	</form>
 	</div>

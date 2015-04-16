@@ -18,6 +18,11 @@
 		<% authors.forEach(function(obj){ %>
 			<a href="/article/<%= obj.id %>"><%= obj.title %></a>
 		<% }); %>
-
+	<div class="footer">
+	<form method="POST" action="/user/<%= users.id %>?_method=DELETE">
+		<input type="checkbox" name="delete" value="delete" required>Confirm Delete</input>
+	<button>Delete Profile</button>
+	</form>
+	</div>
 </body>
 </html>
