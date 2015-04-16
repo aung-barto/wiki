@@ -11,6 +11,20 @@ var sqlite3 = require("sqlite3").verbose();
 var db = new sqlite3.Database("./db/posts.db");
 app.use(express.static("public"));
 
+//using markdown 
+// var marked = require('marked');
+// marked.setOptions({
+//   renderer: new marked.Renderer(),
+//   gfm: true,
+//   tables: true,
+//   breaks: false,
+//   pedantic: false,
+//   sanitize: true,
+//   smartLists: true,
+//   smartypants: false
+// });
+// console.log(marked('I am using __markdown__.'));
+
 //idiot proof
 app.get("/", function(req,res){
 	res.redirect("/wiki");
@@ -86,6 +100,16 @@ app.get("/article/:id", function(req,res){
 				}
 			});
 		}
+	});
+});
+
+//go to article from search form
+app.post("/wiki/search", function(req,res){
+	var searchTitle = req.body.title;
+	console.log(searchTitle);
+	db.get("SELECT id FROM articles WHERE title = ? ;",searchTitle, function(err,data){
+		if(err){console.log(err);}
+		res.redirect("/article/" + data.id);
 	});
 });
 

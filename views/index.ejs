@@ -5,7 +5,7 @@
 	<title>Wikifoodies</title>
 	<a href="/article/new">Create New Article</a>
 	<a href="/user/new">Create New User</a>
-	<form method="GET" action="/article/<%= articles.id %>">
+	<form method="POST" action="/wiki/search">
 		<input type="text" name="title" placeholder="Search by title" required>
 		<button>Search</button>
 	</form>
