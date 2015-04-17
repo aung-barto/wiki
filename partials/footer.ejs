@@ -1,0 +1,18 @@
+		<div id="footer">
+		<form method="POST" action="/article/<%= articles.id %>">
+		<label>Choose Your Username</label>
+			<select name="username">
+			<% allUsers.forEach(function(name){ %>
+				<option value="<%= name.id %>"><%= name.name %></option>
+				<% }); %>
+			</select>
+			<button>Subscribe To This Article</button>
+		</form>
+		
+		<form method="POST" action="/article/<%=articles.id %>?_method=DELETE">
+			<input type="checkbox" name="delete" value="delete" required>Confirm</input>
+		<button>Delete Article</button>
+		</form>
+		</div>
+</body>
+</html>

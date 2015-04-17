@@ -12,18 +12,9 @@ var db = new sqlite3.Database("./db/posts.db");
 app.use(express.static("public"));
 
 //using markdown 
-// var marked = require('marked');
-// marked.setOptions({
-//   renderer: new marked.Renderer(),
-//   gfm: true,
-//   tables: true,
-//   breaks: false,
-//   pedantic: false,
-//   sanitize: true,
-//   smartLists: true,
-//   smartypants: false
-// });
-// console.log(marked('I am using __markdown__.'));
+var marked = require("marked");
+
+console.log(marked('I am using __markdown__.'));
 
 //idiot proof
 app.get("/", function(req,res){
@@ -79,7 +70,8 @@ app.get("/article/:id", function(req,res){
 	var artID = parseInt(req.params.id);
 	db.get("SELECT * FROM articles WHERE id = " + artID, function(err,thisArt){
 		if(err){console.log(err);}
-		// console.log(thisArt);
+	
+		var markedContent = marked(thisArt.content);
 
 		//if users have already subscribed to article, do not show their name
 		db.all("SELECT id, name FROM users WHERE id NOT IN (SELECT user_id FROM subscribers WHERE article_id = ?)",artID, function(err,userlist){
@@ -91,7 +83,7 @@ app.get("/article/:id", function(req,res){
 				if(err){console.log(err);}
 				// console.log(author);
 
-				res.render("show.ejs", {articles: thisArt, allUsers: userlist, info: author});
+				res.render("show.ejs", {articles: thisArt, allUsers: userlist, info: author, content: markedContent});
 			});
 		});
 	});
