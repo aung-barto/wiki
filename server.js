@@ -36,7 +36,7 @@ app.get("/wiki", function(req,res){
 			console.log(err);
 		}else{
 			var all_articles = data.reverse();
-			console.log(data);
+			// console.log(data);
 			db.all("SELECT users.name, users.id FROM users;", function(err,data){
 				if(err){
 					console.log(err);
@@ -78,8 +78,9 @@ app.get("/article/:id", function(req,res){
 	db.get("SELECT * FROM articles WHERE id = " + artID, function(err,thisArt){
 		if(err){console.log(err);}
 		// console.log(thisArt);
-		db.all("SELECT * FROM users;", function(err,userlist){
+		db.all("SELECT id, name FROM users WHERE id NOT IN (SELECT user_id FROM subscribers WHERE article_id = ?)",artID, function(err,userlist){
 			if(err){console.log(err);}
+			// console.log(userlist);
 
 			//getting author of the article
 			db.get("SELECT articles.author_id, users.name FROM articles INNER JOIN users ON articles.author_id = users.id WHERE articles.id = " + artID, function(err,author){
@@ -91,12 +92,12 @@ app.get("/article/:id", function(req,res){
 		});
 	});
 });
-	
 
 //subscribe to an article
 app.post("/article/:id", function(req,res){
-	db.run("INSERT INTO subscribers (article_id, user_id) VALUES (?,?);", parseInt(req.params.id), req.body.username, function(err,data){
+	db.run("INSERT INTO subscribers (article_id, user_id) VALUES (?,?);", parseInt(req.params.id), req.body.username, function(err,number){
 		if(err){console.log(err);}
+
 		// console.log(req.params.id);
 		// console.log(req.body.username);
 
@@ -104,6 +105,7 @@ app.post("/article/:id", function(req,res){
 		res.redirect("/article/" + parseInt(req.params.id));
 	});
 });
+
 
 //go to article from search form
 app.post("/wiki/search", function(req,res){
@@ -162,7 +164,6 @@ app.get("/article/:id/history", function(req,res){
 
 //go to user setup page
 app.get("/user/new", function(req,res){
-	if(err){console.log(err);}
 	res.render("create_user.ejs");
 });
 
