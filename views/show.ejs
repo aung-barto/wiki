@@ -32,7 +32,16 @@
 	<p><%= articles.content %></p>
 
 	<div class="footer">
-	<a href="/article/<%= articles.id %>/subscribe">Subscribe to this article</a>
+	<form method="POST" action="/article/<%= articles.id %>">
+	<label>Choose Your Username</label>
+		<select name="username">
+		<% allUsers.forEach(function(name){ %>
+			<option value="<%= name.id %>"><%= name.name %></option>
+			<% }); %>
+		</select>
+		<button>Subscribe To This Article</button>
+	</form>
+	
 	<a href="/article/<%= articles.id %>/edit">Edit Article</a>
 	<form method="POST" action="/article/<%=articles.id %>?_method=DELETE">
 		<input type="checkbox" name="delete" value="delete" required>Confirm</input>

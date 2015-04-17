@@ -36,7 +36,7 @@ app.get("/wiki", function(req,res){
 			console.log(err);
 		}else{
 			var all_articles = data.reverse();
-			// console.log(data);
+			console.log(data);
 			db.all("SELECT users.name, users.id FROM users;", function(err,data){
 				if(err){
 					console.log(err);
@@ -67,9 +67,8 @@ app.post("/articles", function(req,res){
 			db.run("INSERT INTO co_authors (article_id, user_id, content, image, comment) VALUES (?,?,?,?,?);", req.body.article_id, req.body.user_id, req.body.content, req.body.image, req.body.comment, function(err,data2){
 				if(err){console.log(err);}
 				res.redirect("/article/"+id); //go to individual article page
-				}
-			});
-		}
+				});
+			}
 	});
 });
 
@@ -78,15 +77,31 @@ app.get("/article/:id", function(req,res){
 	var artID = parseInt(req.params.id);
 	db.get("SELECT * FROM articles WHERE id = " + artID, function(err,thisArt){
 		if(err){console.log(err);}
+		// console.log(thisArt);
+		db.all("SELECT * FROM users;", function(err,userlist){
+			if(err){console.log(err);}
 
-		//getting author of the article
-		db.get("SELECT articles.author_id, users.name FROM articles INNER JOIN users ON articles.author_id = users.id WHERE articles.id = " + artID, function(err,other){
+			//getting author of the article
+			db.get("SELECT articles.author_id, users.name FROM articles INNER JOIN users ON articles.author_id = users.id WHERE articles.id = " + artID, function(err,author){
 				if(err){console.log(err);}
+				// console.log(author);
 
-				res.render("show.ejs", {articles: thisArt, info: other});
-				}
+				res.render("show.ejs", {articles: thisArt, allUsers: userlist, info: author});
 			});
-		}
+		});
+	});
+});
+	
+
+//subscribe to an article
+app.post("/article/:id", function(req,res){
+	db.run("INSERT INTO subscribers (article_id, user_id) VALUES (?,?);", parseInt(req.params.id), req.body.username, function(err,data){
+		if(err){console.log(err);}
+		// console.log(req.params.id);
+		// console.log(req.body.username);
+
+		// res.write("<script language='javascript'>alert('Thanks for your subscription. You will be getting an email from Wikifoodies Team shortly!')</script>");
+		res.redirect("/article/" + parseInt(req.params.id));
 	});
 });
 
@@ -107,7 +122,7 @@ app.get("/article/:id/edit", function(req,res){
 	var artID = parseInt(req.params.id);
 	db.get("SELECT * FROM articles WHERE id = " + artID, function(err,data){
 		if(err){console.log(err);}
-		
+
 		db.all("SELECT * FROM users;", function(err,userInfo){
 			res.render("edit.ejs", {thisArt: data, users: userInfo});
 		});
@@ -132,16 +147,15 @@ app.put("/article/:id", function(req,res){
 app.get("/article/:id/history", function(req,res){
 	var articleID = parseInt(req.params.id);
 
-		db.all("SELECT users.name, users.id, co_authors.comment, co_authors.updated_at FROM co_authors INNER JOIN users ON co_authors.user_id = users.id WHERE co_authors.article_id = " + articleID, function(err,userData){
+	db.all("SELECT users.name, users.id, co_authors.comment, co_authors.updated_at FROM co_authors INNER JOIN users ON co_authors.user_id = users.id WHERE co_authors.article_id = " + articleID, function(err,userData){
+		if(err){console.log(err);}
+		// console.log(userData);
+
+		db.all("SELECT title, id FROM articles WHERE id = " + articleID, function(err, artData){
 			if(err){console.log(err);}
-			// console.log(userData);
+			// console.log(artData);
 
-			db.all("SELECT title, id FROM articles WHERE id = " + articleID, function(err, artData){
-				if(err){console.log(err);}
-				// console.log(artData);
-
-				res.render("history.ejs", {allUsers: userData, articles: artData});
-			// });
+			res.render("history.ejs", {allUsers: userData, articles: artData});
 		});
 	});
 });
@@ -195,7 +209,6 @@ app.delete("/user/:id", function(req,res){
 		res.redirect("/wiki"); 
 	});
 });
-
 
 
 app.listen("3000");
