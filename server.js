@@ -64,6 +64,8 @@ app.post("/articles", function(req,res){
 		if(err){console.log(err);
 		}else{
 			var id = this.lastID;
+
+			//push new info into co_authors table as a record
 			db.run("INSERT INTO co_authors (article_id, user_id, content, image, comment) VALUES (?,?,?,?,?);", req.body.article_id, req.body.user_id, req.body.content, req.body.image, req.body.comment, function(err,data2){
 				if(err){console.log(err);}
 				res.redirect("/article/"+id); //go to individual article page
@@ -78,6 +80,8 @@ app.get("/article/:id", function(req,res){
 	db.get("SELECT * FROM articles WHERE id = " + artID, function(err,thisArt){
 		if(err){console.log(err);}
 		// console.log(thisArt);
+
+		//if users have already subscribed to article, do not show their name
 		db.all("SELECT id, name FROM users WHERE id NOT IN (SELECT user_id FROM subscribers WHERE article_id = ?)",artID, function(err,userlist){
 			if(err){console.log(err);}
 			// console.log(userlist);
@@ -149,10 +153,12 @@ app.put("/article/:id", function(req,res){
 app.get("/article/:id/history", function(req,res){
 	var articleID = parseInt(req.params.id);
 
+	//info to be displayed on page
 	db.all("SELECT users.name, users.id, co_authors.comment, co_authors.updated_at FROM co_authors INNER JOIN users ON co_authors.user_id = users.id WHERE co_authors.article_id = " + articleID, function(err,userData){
 		if(err){console.log(err);}
 		// console.log(userData);
 
+		//get article title, this one never get edited
 		db.all("SELECT title, id FROM articles WHERE id = " + articleID, function(err, artData){
 			if(err){console.log(err);}
 			// console.log(artData);
@@ -185,10 +191,20 @@ app.get("/user/:id", function(req,res){
 		// console.log(thisUser);
 
 		//get authored articles
-		db.all("SELECT articles.title, articles.id FROM articles WHERE author_id = " + userID, function(err,thisAuthor){
+		db.all("SELECT DISTINCT articles.title, articles.id FROM articles WHERE author_id = " + userID, function(err,thisAuthor){
 			if(err){console.log(err);}
+
+			//get co-authored articles
+			db.all("SELECT DISTINCT articles.title, articles.id FROM articles INNER JOIN co_authors ON articles.id = co_authors.article_id WHERE articles.author_id = " + userID, function(err,thisCoAut){
+				console.log(thisCoAut); 
+
+				//get subscribed articles
+				db.all("SELECT DISTINCT articles.title, articles.id FROM articles INNER JOIN subscribers ON articles.id = subscribers.article_id;", function(err,thisSub){
+					console.log(thisSub);
 			
-			res.render("user.ejs", {users: thisUser, authors: thisAuthor});
+				res.render("user.ejs", {users: thisUser, authors: thisAuthor, co_authors: thisCoAut, subscribers: thisSub});
+				});
+			});
 		});
 	});
 });

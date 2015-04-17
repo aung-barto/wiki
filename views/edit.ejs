@@ -13,22 +13,20 @@
 <body>
 	<h2>Editing <%= thisArt.title %></h2>
 	<p> You must have a user profile to edit this article.</p>
-	<%= thisArt.id %>
 	<form method="POST" action="/article/<%= thisArt.id %>?_method=PUT">
 		<input type="hidden" name="article_id" value="<%= thisArt.id %>">
-		<label>Content: </label>
-		<textarea name="content" rows="30" cols="60"><%= thisArt.content %></textarea></br>
-		<label>Image URL: (optional)</label>
-		<textarea name="image" rows="3" cols="45"><%= thisArt.image %></textarea></br>
-		<label>Note about this edit:</label>
-		<textarea name="comment" rows="3" cols="45"><%= thisArt.comment %></textarea></br></br>
-
-		<label>Select User Name</label>
+		<label>Select Your Username:</label>
 		<select name="user_id">
 		<% users.forEach(function(userObj){ %>
 			<option value="<%= userObj.id %>"><%= userObj.name %></option>
 			<% }); %>
 		</select></br></br>
+		<label>Content: </label><br>
+		<textarea name="content" rows="30" cols="60"><%= thisArt.content %></textarea></br>
+		<label>Image URL: (optional)</label><br>
+		<textarea name="image" rows="3" cols="60"><%= thisArt.image %></textarea></br>
+		<label>Note about this edit:</label><br>
+		<textarea name="comment" rows="3" cols="60"><%= thisArt.comment %></textarea></br></br>
 
 		<button>Submit Changes</button>
 	</form>

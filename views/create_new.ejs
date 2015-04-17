@@ -14,17 +14,19 @@
 	<p>You must have a user profile before you can create a new article</p>
 	<form method="POST" action="/articles">
 		<label>Title:</label>
-		<input type="text" name="title" placeholder="Title" required></br>
-		<label>Content:</label>
-		<textarea name="content" placeholder="content" required></textarea></br>
-		<label>Image URL:</label>
-		<textarea name="image" placeholder="URL"></textarea></br>
-		<label>User Name:</label>
-			<select name="author_id">
-			<% users.forEach(function(obj){ %>
-			<option value="<%= obj.id %>"><%= obj.name %></option>
-			<% }); %>
-			</select></br></br>
+		<input type="text" name="title" placeholder="Title" required>
+
+		<label>Username:</label>
+		<select name="author_id">
+		<% users.forEach(function(obj){ %>
+		<option value="<%= obj.id %>"><%= obj.name %></option>
+		<% }); %>
+		</select></br></br>
+
+		<label>Content:</label><br>
+		<textarea name="content" placeholder="content" rows="30" cols="60" required></textarea></br>
+		<label>Image URL:</label><br>
+		<textarea name="image" placeholder="URL" rows="3" cols="60"></textarea></br>
 	<button>Submit</button>
 	</form>
 </body>

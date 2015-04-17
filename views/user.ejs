@@ -17,8 +17,19 @@
 
 		<h4>Authorships:</h4>
 		<% authors.forEach(function(obj){ %>
-			<a href="/article/<%= obj.id %>"><%= obj.title %></a>
+		<a href="/article/<%= obj.id %>"><%= obj.title %></a>
 		<% }); %>
+
+		<h4>Contributions:</h4>
+		<% co_authors.forEach(function(coObj){ %>
+		<a href="/article/<%= coObj.id %>"><%= coObj.title%></a>
+		<% }); %>
+
+		<h4>Subscriptions:</h4>
+		<% subscribers.forEach(function(subObj){ %>
+		<a href="/article/<%= subObj.id %>"><%= subObj.title %></a>
+		<% }); %>
+
 	<div class="footer">
 	<form method="POST" action="/user/<%= users.id %>?_method=DELETE">
 		<input type="checkbox" name="delete" value="delete" required>Confirm Delete</input>
