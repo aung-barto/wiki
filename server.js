@@ -70,7 +70,7 @@ app.get("/article/:id", function(req,res){
 	var artID = parseInt(req.params.id);
 	db.get("SELECT * FROM articles WHERE id = " + artID, function(err,thisArt){
 		if(err){console.log(err);}
-	
+
 		var markedContent = marked(thisArt.content);
 
 		//if users have already subscribed to article, do not show their name
@@ -109,7 +109,6 @@ app.post("/wiki/search", function(req,res){
 	// console.log(searchTitle);
 	db.get("SELECT id FROM articles WHERE title = ? ;",searchTitle, function(err,data){
 		if(err){console.log(err);}
-
 		res.redirect("/article/" + data.id);
 	});
 });
@@ -121,6 +120,7 @@ app.get("/article/:id/edit", function(req,res){
 	db.get("SELECT * FROM articles WHERE id = " + artID, function(err,data){
 		if(err){console.log(err);}
 
+		//get user info to display
 		db.all("SELECT * FROM users;", function(err,userInfo){
 			res.render("edit.ejs", {thisArt: data, users: userInfo});
 		});
@@ -135,7 +135,6 @@ app.put("/article/:id", function(req,res){
 		// console.log(req.body);
 		db.run("INSERT INTO co_authors(article_id, user_id, content, image, comment) VALUES(?,?,?,?,?);", req.body.article_id, req.body.user_id, req.body.content, req.body.image, req.body.comment, function(err,data){
 			if(err){console.log(err);}
-
 			res.redirect("/article/" + parseInt(req.params.id));
 		});
 	});
@@ -154,7 +153,6 @@ app.get("/article/:id/history", function(req,res){
 		db.all("SELECT title, id FROM articles WHERE id = " + articleID, function(err, artData){
 			if(err){console.log(err);}
 			// console.log(artData);
-
 			res.render("history.ejs", {allUsers: userData, articles: artData});
 		});
 	});
@@ -169,8 +167,8 @@ app.get("/user/new", function(req,res){
 app.post("/users", function(req,res){
 	db.run("INSERT INTO users (name,email,location) VALUES(?,?,?);", req.body.name, req.body.email, req.body.location, function(err,data){
 		if(err){console.log(err);}
-			var id = this.lastID;
-			res.redirect("/user/"+id); //go to user page
+		var id = this.lastID;
+		res.redirect("/user/"+id); //go to user page
 	});
 });
 
@@ -188,15 +186,41 @@ app.get("/user/:id", function(req,res){
 
 			//get co-authored articles
 			db.all("SELECT DISTINCT articles.title, articles.id FROM articles INNER JOIN co_authors ON articles.id = co_authors.article_id WHERE articles.author_id = " + userID, function(err,thisCoAut){
-				console.log(thisCoAut); 
+				// console.log(thisCoAut); 
 
 				//get subscribed articles
-				db.all("SELECT DISTINCT articles.title, articles.id FROM articles INNER JOIN subscribers ON articles.id = subscribers.article_id;", function(err,thisSub){
-					console.log(thisSub);
-			
+				db.all("SELECT DISTINCT articles.id, articles.title FROM articles INNER JOIN subscribers ON articles.id = subscribers.article_id WHERE subscribers.user_id = " + userID, function(err,thisSub){
+					// console.log(thisSub);
 				res.render("user.ejs", {users: thisUser, authors: thisAuthor, co_authors: thisCoAut, subscribers: thisSub});
 				});
 			});
+		});
+	});
+});
+
+//go to edit user page
+app.get("/user/:id/edit", function(req,res){
+	var userID = parseInt(req.params.id);
+
+	//get user info
+	db.get("SELECT * FROM users WHERE id = " + userID, function(err,data3){
+		if(err){console.log(err);}
+
+		//get subscription info
+		db.all("SELECT DISTINCT articles.id, articles.title FROM articles INNER JOIN subscribers ON articles.id = subscribers.article_id WHERE subscribers.user_id = " + userID, function(err,data4){
+			if(err){console.log(err)}
+			res.render("user_edit.ejs", {userInfo: data3, subInfo: data4});
+		});
+	});
+});
+
+//update user page
+app.put("/user/:id", function(req,res){
+	db.run("UPDATE subscribers SET article_id = ? WHERE user_id = " + parseInt(req.params.id), req.body.articles_id, function(err,data){
+		if(err){console.log(err);}
+		db.run("UPDATE users SET name = ?, email = ?, location = ? WHERE id = " + parseInt(req.params.id), req.body.name, req.body.email, req.body.location, function(err,data){
+			if(err){console.log(err);}
+			res.redirect("/user/" + parseInt(req.params.id));
 		});
 	});
 });
@@ -205,7 +229,6 @@ app.get("/user/:id", function(req,res){
 app.delete("/article/:id", function(req,res){
 	db.run("DELETE FROM articles WHERE id = " + parseInt(req.params.id), function(err,data){
 		if(err){console.log(err);}
-
 		res.redirect("/wiki"); //redirect to index page after deleting
 	});
 });
@@ -214,11 +237,9 @@ app.delete("/article/:id", function(req,res){
 app.delete("/user/:id", function(req,res){
 	db.run("DELETE FROM users WHERE id = " + parseInt(req.params.id), function(err,data){
 		if(err){console.log(err);}
-
 		res.redirect("/wiki"); 
 	});
 });
-
 
 app.listen("3000");
 console.log("Server listening to port 3000");

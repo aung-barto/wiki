@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title><%= userInfo.name %></title>
+
+	<nav>
+	<a href="/wiki">Home</a>
+	<a href="/article/new">Create New Article</a>
+	<a href="/user/new">Create New User</a>
+	</nav>
+	<h1>Wikifoodies</h1>
+</head>
+<body>
+	<h2>Edit Your Profile</h2>
+		<form method="POST" action="/user/<%= userInfo.id %>?_method=PUT">
+		<label>Name</label><br>
+		<input type="text" name="name" value="<%= userInfo.name %>"><br><br>
+		<label>Email</label><br>
+		<input type="text" name="email" value="<%= userInfo.email %>"><br><br>
+		<label>Location (Optional)</label><br>
+		<input type="text" name="location" value="<%= userInfo.location %>"><br><br>
+	<h2>Edit Your Article Subscriptions</h2>
+		
+	<form method="POST" action="/user/<%= userInfo.id %>?_method=PUT">
+		<% subInfo.forEach(function(subObj){ %>
+		<input type="checkbox" name="subs" value="<%= subObj.id %>"><%= subObj.title %><br>
+		<% }); %>
+	<button>Submit</button>
+	</form>
+</body>
+</html>
