@@ -32,7 +32,7 @@
 	<p><%= articles.content %></p>
 
 	<div class="footer">
-	<a href="/subscribe">Subscribe to this article</a>
+	<a href="/article/<%= articles.id %>/subscribe">Subscribe to this article</a>
 	<a href="/article/<%= articles.id %>/edit">Edit Article</a>
 	<form method="POST" action="/article/<%=articles.id %>?_method=DELETE">
 		<input type="checkbox" name="delete" value="delete" required>Confirm</input>

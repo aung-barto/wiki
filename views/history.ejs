@@ -12,17 +12,44 @@
 	<a href="/article/<%= artObj.id %>">Back to Main Article</a>
 	</nav>
 	<h1>Wikifoodies</h1>
+	<style>
+	p {
+		display: inline;
+	}
+
+	.list{
+		display: inline;
+	}
+
+	.one{
+		margin-left: 10px;
+	}
+
+	.two{
+		margin-left: 50px;
+	}
+
+	.three{
+		margin-left: 100px;
+	}
+
+	</style>
+
 </head>
 <body>
 	<h2><%= artObj.title %></h2>
 	<% }); %>
-	<ul>
+	<div class="list">
+		<p class="one">usernames</p>
+		<p class="two">comments</p>
+		<p class="three">time</p>
+	</div></br></br>
 	<% allUsers.forEach(function(obj){ %>
-		<li><a href="/user/<%= obj.user_id%>"><%= obj.name %></a></li>
-		<li><p><%= obj.comment %></p></li>
-		<li><a href="/article/<%= articles.article_id %>/<%= obj.id %>"><%= obj.updated_at %></a></li>
+		<p class="one"><a href="/user/<%= obj.user_id%>"><%= obj.name %></a></p>
+		<p class="two"><%= obj.comment %></p></li>
+		<p class="three"><a href="/article/<%= articles.article_id %>/<%= obj.id %>"><%= obj.updated_at %></a></p></br></br>
 	<% }); %>
-	</ul>
+	
 </body>
 </html>
 		

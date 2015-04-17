@@ -65,9 +65,8 @@ app.post("/articles", function(req,res){
 		}else{
 			var id = this.lastID;
 			db.run("INSERT INTO co_authors (article_id, user_id, content, image, comment) VALUES (?,?,?,?,?);", req.body.article_id, req.body.user_id, req.body.content, req.body.image, req.body.comment, function(err,data2){
-				if(err){console.log(err);
-				}else{
-					res.redirect("/article/"+id); //go to individual article page
+				if(err){console.log(err);}
+				res.redirect("/article/"+id); //go to individual article page
 				}
 			});
 		}
@@ -78,15 +77,13 @@ app.post("/articles", function(req,res){
 app.get("/article/:id", function(req,res){
 	var artID = parseInt(req.params.id);
 	db.get("SELECT * FROM articles WHERE id = " + artID, function(err,thisArt){
-	if(err){
-		console.log(err)
-	}else{
+		if(err){console.log(err);}
+
 		//getting author of the article
 		db.get("SELECT articles.author_id, users.name FROM articles INNER JOIN users ON articles.author_id = users.id WHERE articles.id = " + artID, function(err,other){
-				if(err){
-					console.log(err)
-				}else{
-					res.render("show.ejs", {articles: thisArt, info: other});
+				if(err){console.log(err);}
+
+				res.render("show.ejs", {articles: thisArt, info: other});
 				}
 			});
 		}
@@ -96,9 +93,10 @@ app.get("/article/:id", function(req,res){
 //go to article from search form
 app.post("/wiki/search", function(req,res){
 	var searchTitle = req.body.title;
-	console.log(searchTitle);
+	// console.log(searchTitle);
 	db.get("SELECT id FROM articles WHERE title = ? ;",searchTitle, function(err,data){
 		if(err){console.log(err);}
+
 		res.redirect("/article/" + data.id);
 	});
 });
@@ -108,7 +106,8 @@ app.post("/wiki/search", function(req,res){
 app.get("/article/:id/edit", function(req,res){
 	var artID = parseInt(req.params.id);
 	db.get("SELECT * FROM articles WHERE id = " + artID, function(err,data){
-		if(err){console.log(err)}
+		if(err){console.log(err);}
+		
 		db.all("SELECT * FROM users;", function(err,userInfo){
 			res.render("edit.ejs", {thisArt: data, users: userInfo});
 		});
@@ -117,10 +116,12 @@ app.get("/article/:id/edit", function(req,res){
 
 //update article page
 app.put("/article/:id", function(req,res){
-	console.log(parseInt(req.params.id));
-	db.run("UPDATE articles SET content = ?, image = ?, WHERE id = ?;",req.body.content, req.body.image, parseInt(req.params.id), function(err,data){
-		console.log(req.body);
+	// console.log(parseInt(req.params.id));
+	db.run("UPDATE articles SET content = ?, image = ? WHERE id = " + parseInt(req.params.id),req.body.content, req.body.image, function(err,data){
+		if(err){console.log(err);}
+		// console.log(req.body);
 		db.run("INSERT INTO co_authors(article_id, user_id, content, image, comment) VALUES(?,?,?,?,?);", req.body.article_id, req.body.user_id, req.body.content, req.body.image, req.body.comment, function(err,data){
+			if(err){console.log(err);}
 
 			res.redirect("/article/" + parseInt(req.params.id));
 		});
@@ -130,17 +131,14 @@ app.put("/article/:id", function(req,res){
 //go to history of each article
 app.get("/article/:id/history", function(req,res){
 	var articleID = parseInt(req.params.id);
-	// db.all("SELECT * FROM co_authors WHERE article_id = " + articleID, function(err,revisions){
-	// 	if(err){console.log(err)}
-	// 	console.log(revisions);
 
 		db.all("SELECT users.name, users.id, co_authors.comment, co_authors.updated_at FROM co_authors INNER JOIN users ON co_authors.user_id = users.id WHERE co_authors.article_id = " + articleID, function(err,userData){
-			if(err){console.log(err)}
-			console.log(userData);
+			if(err){console.log(err);}
+			// console.log(userData);
 
 			db.all("SELECT title, id FROM articles WHERE id = " + articleID, function(err, artData){
-				if(err){console.log(err)}
-				console.log(artData);
+				if(err){console.log(err);}
+				// console.log(artData);
 
 				res.render("history.ejs", {allUsers: userData, articles: artData});
 			// });
@@ -150,31 +148,32 @@ app.get("/article/:id/history", function(req,res){
 
 //go to user setup page
 app.get("/user/new", function(req,res){
+	if(err){console.log(err);}
 	res.render("create_user.ejs");
 });
 
 //create a new user and confirm
 app.post("/users", function(req,res){
 	db.run("INSERT INTO users (name,email,location) VALUES(?,?,?);", req.body.name, req.body.email, req.body.location, function(err,data){
+		if(err){console.log(err);}
 			var id = this.lastID;
 			res.redirect("/user/"+id); //go to user page
 	});
 });
 
-
 //user page
 app.get("/user/:id", function(req,res){
 	var userID = parseInt(req.params.id);
 	db.get("SELECT * FROM users WHERE id = " + userID, function(err,data){
-			thisUser = data;
-			// console.log(thisUser);
+		if(err){console.log(err);}
+		thisUser = data;
+		// console.log(thisUser);
 
 		//get authored articles
 		db.all("SELECT articles.title, articles.id FROM articles WHERE author_id = " + userID, function(err,thisAuthor){
+			if(err){console.log(err);}
 			
-				res.render("user.ejs", {users: thisUser, authors: thisAuthor});
-			// 	});
-			// });
+			res.render("user.ejs", {users: thisUser, authors: thisAuthor});
 		});
 	});
 });
@@ -182,6 +181,8 @@ app.get("/user/:id", function(req,res){
 //delete an article
 app.delete("/article/:id", function(req,res){
 	db.run("DELETE FROM articles WHERE id = " + parseInt(req.params.id), function(err,data){
+		if(err){console.log(err);}
+
 		res.redirect("/wiki"); //redirect to index page after deleting
 	});
 });
@@ -189,6 +190,8 @@ app.delete("/article/:id", function(req,res){
 //delete a user
 app.delete("/user/:id", function(req,res){
 	db.run("DELETE FROM users WHERE id = " + parseInt(req.params.id), function(err,data){
+		if(err){console.log(err);}
+
 		res.redirect("/wiki"); 
 	});
 });
