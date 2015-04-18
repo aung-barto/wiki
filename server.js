@@ -14,7 +14,22 @@ app.use(express.static("public"));
 //using markdown 
 var marked = require("marked");
 
-console.log(marked('I am using __markdown__.'));
+//Sendgrid when an article is updated
+var sendgrid  = require('sendgrid')("aung-barto", "wikifoodies");
+
+//Sendgrid when someone subscribes to an article
+// var subList = [];
+// var subArt = [];
+// var subscription = {
+//   to      : sublist,
+//   from    : "admin@wikifoodies.com",
+//   subject : "Thank You For Your Subscription!",
+//   text    : "You have subscribed to " + subArt + " article. You will receive updates when someone edited or made changes to this article."
+// }
+// sendgrid.send(subscription, function(err, json) {
+//   if (err) { console.error(err); }
+//   console.log(json);
+// });
 
 //idiot proof
 app.get("/", function(req,res){
@@ -22,11 +37,16 @@ app.get("/", function(req,res){
 });
 //shows all articles
 app.get("/wiki", function(req,res){
-	db.all("SELECT * FROM articles;", function(err,data){
+	db.all("SELECT * FROM articles;", function(err,data1){
+
 		if(err){
 			console.log(err);
 		}else{
-			var all_articles = data.reverse();
+			data1.map(function(obj) {
+                obj.content = marked(obj.content);
+            });
+            console.log(data1);
+			var all_articles = data1.reverse();
 			// console.log(data);
 			db.all("SELECT users.name, users.id FROM users;", function(err,data){
 				if(err){
@@ -130,12 +150,37 @@ app.get("/article/:id/edit", function(req,res){
 //update article page
 app.put("/article/:id", function(req,res){
 	// console.log(parseInt(req.params.id));
+	// var updateMail = new sendgrid.Email({from: "admin@wikifoodies.com"});
 	db.run("UPDATE articles SET content = ?, image = ? WHERE id = " + parseInt(req.params.id),req.body.content, req.body.image, function(err,data){
 		if(err){console.log(err);}
-		// console.log(req.body);
-		db.run("INSERT INTO co_authors(article_id, user_id, content, image, comment) VALUES(?,?,?,?,?);", req.body.article_id, req.body.user_id, req.body.content, req.body.image, req.body.comment, function(err,data){
+
+		db.all("SELECT users.email FROM users INNER JOIN subscribers ON users.id = subscribers.user_id WHERE subscribers.article_id = " + parseInt(req.params.id), function(err,address){
 			if(err){console.log(err);}
-			res.redirect("/article/" + parseInt(req.params.id));
+			console.log(address);
+
+			db.get("SELECT title FROM articles WHERE id = " + parseInt(req.params.id), function(err, artTitle){
+				if(err){console.log(err);}
+				console.log(artTitle);
+
+				// updateMail.to = address[0];
+				// var bccReceive = [];
+				// for(i = 1; i < address.length; i++){
+				// 	bccReceive.push(address[i]);
+				// }
+				// updateMail.bcc = bccReceive;
+				// updateMail.subject = artTitle + " has been updated!"
+				// updateMail.text = "Just a friendly note from our team at Wikifoodies." + artTitle + " article has been updated."
+
+				// sendgrid.send(updateMail, function(err, json) {
+  		// 		if (err) { console.error(err); }
+  		// 		console.log(json);
+				// });
+
+				db.run("INSERT INTO co_authors(article_id, user_id, content, image, comment) VALUES(?,?,?,?,?);", req.body.article_id, req.body.user_id, req.body.content, req.body.image, req.body.comment, function(err,data){
+					if(err){console.log(err);}
+					res.redirect("/article/" + parseInt(req.params.id));
+				});
+			});
 		});
 	});
 });

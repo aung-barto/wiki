@@ -28,11 +28,13 @@
 			<% if(art_obj.author_id === aut_obj.id){ %>
 				<a href="/user/<%= aut_obj.id %>">By: <%= aut_obj.name %></a> 
 			<% } %>
-		<% }); %>
-		
+		<% }); %>		
+
 		<p><%= art_obj.create_at %></p>
 		<img src="<%= art_obj.image %>">
-		<p><%= art_obj.content.substring(0,100) %>...</p>
+		<%- art_obj.content.substring(0,100) %>
+		 
+
 		<a href="/article/<%= art_obj.id %>">Read More</a>
 	<% }); %>
 </body>
