@@ -15,7 +15,7 @@ app.use(express.static("public"));
 var marked = require("marked");
 
 //Sendgrid when an article is updated
-var sendgrid  = require('sendgrid')("aung-barto", "wikifoodies");
+var sendgrid  = require('sendgrid')("Foodies", "WIKIfoodie3");
 
 //Sendgrid when someone subscribes to an article
 // var subList = [];
@@ -91,7 +91,21 @@ app.get("/article/:id", function(req,res){
 	db.get("SELECT * FROM articles WHERE id = " + artID, function(err,thisArt){
 		if(err){console.log(err);}
 
-		var markedContent = marked(thisArt.content);
+		//turn [[title]] into a link
+		var newContent = [];
+		db.all("SELECT title FROM articles;", function(err,allArt){
+			allArt.forEach(function(article){
+				if(thisArt.content.indexOf("[["+ article.title + "]]") != -1){
+					console.log(article.title);
+					var href = "<a href='/article/" + article.id + "'>";
+					console.log(href);
+					var openLink = thisArt.content.replace(/\[\[/, href);
+					newContent.push(openLink.replace(/\]\]/, "</a>"));
+					console.log(newContent);
+				}
+			});
+		});
+		var markedContent = marked(newContent);
 
 		//if users have already subscribed to article, do not show their name
 		db.all("SELECT id, name FROM users WHERE id NOT IN (SELECT user_id FROM subscribers WHERE article_id = ?)",artID, function(err,userlist){
@@ -150,29 +164,24 @@ app.get("/article/:id/edit", function(req,res){
 //update article page
 app.put("/article/:id", function(req,res){
 	// console.log(parseInt(req.params.id));
-	// var updateMail = new sendgrid.Email({from: "admin@wikifoodies.com"});
+	// var email = new sendgrid.Email({from: "admin@wikifoodies.com"});
 	db.run("UPDATE articles SET content = ?, image = ? WHERE id = " + parseInt(req.params.id),req.body.content, req.body.image, function(err,data){
 		if(err){console.log(err);}
 
 		db.all("SELECT users.email FROM users INNER JOIN subscribers ON users.id = subscribers.user_id WHERE subscribers.article_id = " + parseInt(req.params.id), function(err,address){
 			if(err){console.log(err);}
-			console.log(address);
+			// console.log(address);
 
 			db.get("SELECT title FROM articles WHERE id = " + parseInt(req.params.id), function(err, artTitle){
 				if(err){console.log(err);}
-				console.log(artTitle);
+				// console.log(artTitle);
 
-				// updateMail.to = address[0];
-				// var bccReceive = [];
-				// for(i = 1; i < address.length; i++){
-				// 	bccReceive.push(address[i]);
-				// }
-				// updateMail.bcc = bccReceive;
-				// updateMail.subject = artTitle + " has been updated!"
-				// updateMail.text = "Just a friendly note from our team at Wikifoodies." + artTitle + " article has been updated."
+				// email.to = address;
+				// email.subject = artTitle + " has been updated!";
+				// email.text = "Just a friendly note from our team at Wikifoodies." + artTitle + " article has been updated.";
 
-				// sendgrid.send(updateMail, function(err, json) {
-  		// 		if (err) { console.error(err); }
+				// sendgrid.send(email, function(err, json) {
+  		// 		if (err) { return console.error(err); }
   		// 		console.log(json);
 				// });
 
