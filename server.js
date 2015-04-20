@@ -31,10 +31,10 @@ app.get("/wiki", function(req,res){
 			console.log(err);
 		}else{
 			data1.map(function(obj) {
-                obj.content = marked(obj.content);
-            });
+				obj.content = marked(obj.content);
+			});
             // console.log(data1);
-			var all_articles = data1.reverse();
+            var all_articles = data1.reverse();
 			// console.log(data);
 			db.all("SELECT users.name, users.id FROM users;", function(err,data){
 				if(err){
@@ -53,7 +53,7 @@ app.get("/wiki", function(req,res){
 app.get("/article/new", function(req,res){
 	db.all("SELECT * FROM users;", function(err,data){
 		if(err){console.log(err)}
-		res.render("create_new.ejs", {users: data});
+			res.render("create_new.ejs", {users: data});
 	});
 });
 
@@ -81,28 +81,31 @@ app.post("/articles", function(req,res){
 //show individual article
 app.get("/article/:id", function(req,res){
 	var artID = parseInt(req.params.id);
+	var newContent = [];
+	var sameContent = [];
 	db.get("SELECT * FROM articles WHERE id = " + artID, function(err,thisArt){
 		if(err){console.log(err);}
 		// console.log(thisArt);
+		var markedContent = "";
 
+		if(thisArt.content.indexOf("[[")!= -1){
 		// turn [[title]] into a link
-		// var newContent = "";
-		// db.all("SELECT id,title,link FROM articles;", function(err,allArt){
-		// 	for (var i = 0; i < allArt.length; i++){	
-		// 		console.log(allArt.length);
-		// 		if(thisArt.content.indexOf("[["+ allArt.title + "]]")!= -1){
-		// 			console.log(allArt.title);
-		// 			newContent = thisArt.content.replace("[["+ allArt[i].title + "]]", allArt[i].link);
-		// 		}else {
+			db.all("SELECT id,title,link FROM articles;", function(err,allArt){
+				console.log("93 "+thisArt.content.indexOf("[["));
 
-		// 		}
-		// 	}
-		// 	console.log(newContent);
-		// });
+				for (var i = 0; i < allArt.length; i++){	
+					console.log(thisArt.content.indexOf("[["+ allArt[i].title+"]]"));
+					if(thisArt.content.indexOf("[["+ allArt[i].title + "]]")!=-1){
+						newContent.push(thisArt.content.replace("[["+ allArt[i].title + "]]", allArt[i].link));
+					}
+				} 
+				var joined = newContent.join("");
+				markedContent = marked(joined);
+			});	
 
-		var markedContent = marked(thisArt.content);
-		// console.log(markedContent);
-
+		}else {
+			markedContent = marked(thisArt.content);
+		}
 		//if users have already subscribed to article, do not show their name
 		db.all("SELECT id, name FROM users WHERE id NOT IN (SELECT user_id FROM subscribers WHERE article_id = ?)",artID, function(err,userlist){
 			if(err){console.log(err);}
@@ -116,6 +119,7 @@ app.get("/article/:id", function(req,res){
 				res.render("show.ejs", {articles: thisArt, allUsers: userlist, info: author, content: markedContent});
 			});
 		});
+		
 	});
 });
 
@@ -144,7 +148,7 @@ app.post("/article/:id", function(req,res){
 				//   if (err) { console.error(err); }
 				//   console.log(json);
 				// });
-			});
+		});
 		});
 		res.redirect("/article/" + parseInt(req.params.id));
 	});
@@ -205,13 +209,13 @@ app.put("/article/:id", function(req,res){
   		// 		console.log(json);
 				// });
 
-				db.run("INSERT INTO co_authors(article_id, user_id, content, image, comment) VALUES(?,?,?,?,?);", req.body.article_id, req.body.user_id, req.body.content, req.body.image, req.body.comment, function(err,data){
-					if(err){console.log(err);}
-					res.redirect("/article/" + parseInt(req.params.id));
-				});
+			db.run("INSERT INTO co_authors(article_id, user_id, content, image, comment) VALUES(?,?,?,?,?);", req.body.article_id, req.body.user_id, req.body.content, req.body.image, req.body.comment, function(err,data){
+				if(err){console.log(err);}
+				res.redirect("/article/" + parseInt(req.params.id));
 			});
 		});
-	});
+});
+});
 });
 
 //go to history of each article
@@ -231,6 +235,13 @@ app.get("/article/:id/history", function(req,res){
 		});
 	});
 });
+
+// //go to individual history
+// app.get("/article/:id/history/:v_id", function(req,res){
+// 	var articleID = parseInt(req.params.article_id);
+// 	var versionID = parseInt(req.params.id);
+// 	db.all("SELECT ")
+// });
 
 //go to user setup page
 app.get("/user/new", function(req,res){
@@ -265,7 +276,7 @@ app.get("/user/:id", function(req,res){
 				//get subscribed articles
 				db.all("SELECT articles.id, articles.title FROM articles INNER JOIN subscribers ON articles.id = subscribers.article_id WHERE subscribers.user_id = " + userID, function(err,thisSub){
 					// console.log(thisSub);
-				res.render("user.ejs", {users: thisUser, authors: thisAuthor, co_authors: thisCoAut, subscribers: thisSub});
+					res.render("user.ejs", {users: thisUser, authors: thisAuthor, co_authors: thisCoAut, subscribers: thisSub});
 				});
 			});
 		});
@@ -283,7 +294,7 @@ app.get("/user/:id/edit", function(req,res){
 		//get subscription info
 		db.all("SELECT DISTINCT articles.id, articles.title FROM articles INNER JOIN subscribers ON articles.id = subscribers.article_id WHERE subscribers.user_id = " + userID, function(err,data4){
 			if(err){console.log(err)}
-			res.render("user_edit.ejs", {userInfo: data3, subInfo: data4});
+				res.render("user_edit.ejs", {userInfo: data3, subInfo: data4});
 		});
 	});
 });
