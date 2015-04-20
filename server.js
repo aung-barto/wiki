@@ -18,20 +18,8 @@ var marked = require("marked");
 var sendgrid  = require('sendgrid')("Foodies", "WIKIfoodie3");
 
 //Sendgrid when someone subscribes to an article
-// var subList = [];
-// var subArt = [];
-// var subscription = {
-//   to      : sublist,
-//   from    : "admin@wikifoodies.com",
-//   subject : "Thank You For Your Subscription!",
-//   text    : "You have subscribed to " + subArt + " article. You will receive updates when someone edited or made changes to this article."
-// }
-// sendgrid.send(subscription, function(err, json) {
-//   if (err) { console.error(err); }
-//   console.log(json);
-// });
 
-//idiot proof
+//redirect
 app.get("/", function(req,res){
 	res.redirect("/wiki");
 });
@@ -130,15 +118,33 @@ app.get("/article/:id", function(req,res){
 app.post("/article/:id", function(req,res){
 	db.run("INSERT INTO subscribers (article_id, user_id) VALUES (?,?);", parseInt(req.params.id), req.body.username, function(err,number){
 		if(err){console.log(err);}
+		console.log(req.body.username);
+		//get user email address
+		db.get("SELECT email FROM users WHERE id = " + req.body.username, function(err,userEmail){
+			if(err){console.log(err);}
+			console.log(userEmail);
 
-		// console.log(req.params.id);
-		// console.log(req.body.username);
-
-		// res.write("<script language='javascript'>alert('Thanks for your subscription. You will be getting an email from Wikifoodies Team shortly!')</script>");
+			//get article title
+			db.get("SELECT title FROM articles WHERE id = " + parseInt(req.params.id), function(err,title){
+				if (err){console.log(err);}
+				//send email confirmation for subscription
+				var email = {
+				  to      : userEmail.email,
+				  from    : "admin@wikifoodies.com",
+				  subject : "Thank You For Your Subscription!",
+				  text    : "You have subscribed to " + title.title + "'s article. You will receive updates when someone edited or made changes to this article.\n\n Thanks for your support,\n
+				  WikiFoodies Team"
+				}
+				console.log(email);
+				sendgrid.send(email, function(err, json) {
+				  if (err) { console.error(err); }
+				  console.log(json);
+				});
+			});
+		});
 		res.redirect("/article/" + parseInt(req.params.id));
 	});
 });
-
 
 //go to article from search form
 app.post("/wiki/search", function(req,res){
@@ -187,7 +193,7 @@ app.put("/article/:id", function(req,res){
 					to: addresses,
 					from: "admin@wikifoodies.com",
 					subject: artTitle.title + " has been updated!",
-					text: "Just a friendly note from our team at Wikifoodies. " + artTitle.title + " article has been updated."
+					text: "Just a friendly note from our team at Wikifoodies. " + artTitle.title + "'s article has been updated.\n\n\nHave a Great Day From WikiFoodies Team"
 				}
 				// console.log(email);
 
