@@ -82,30 +82,34 @@ app.post("/articles", function(req,res){
 app.get("/article/:id", function(req,res){
 	var artID = parseInt(req.params.id);
 	var newContent = [];
-	var sameContent = [];
+	// var arr = [];
 	db.get("SELECT * FROM articles WHERE id = " + artID, function(err,thisArt){
 		if(err){console.log(err);}
 		// console.log(thisArt);
 		var markedContent = "";
 
-		if(thisArt.content.indexOf("[[")!= -1){
-		// turn [[title]] into a link
-			db.all("SELECT id,title,link FROM articles;", function(err,allArt){
-				console.log("93 "+thisArt.content.indexOf("[["));
+		// if(thisArt.content.indexOf("[[")!= -1){
+		// // turn [[title]] into a link
+		// 	db.all("SELECT id,title,link FROM articles;", function(err,allArt){
+		// 		var arr = thisArt.content.split(" ");
+		// 		arr.forEach(function(obj){	
+		// 			// console.log(thisArt.content.indexOf("[["));
+		// 			for(var k = 0; k<allArt.length; k++){
+		// 				if(obj[k] === "[["+allArt.title+"]]"){
+		// 					console.log(obj[k]);
+		// 					newContent.push(thisArt.content.replace(obj, obj.link));
+		// 				}
+		// 			}
+		// 		});
+		// 		console.log(newContent);
+		// 	var joined = newContent.join("");
+		// 	markedContent = marked(joined);
+		// 	});
+			
 
-				for (var i = 0; i < allArt.length; i++){	
-					console.log(thisArt.content.indexOf("[["+ allArt[i].title+"]]"));
-					if(thisArt.content.indexOf("[["+ allArt[i].title + "]]")!=-1){
-						newContent.push(thisArt.content.replace("[["+ allArt[i].title + "]]", allArt[i].link));
-					}
-				} 
-				var joined = newContent.join("");
-				markedContent = marked(joined);
-			});	
-
-		}else {
+		// }else {
 			markedContent = marked(thisArt.content);
-		}
+		// }
 		//if users have already subscribed to article, do not show their name
 		db.all("SELECT id, name FROM users WHERE id NOT IN (SELECT user_id FROM subscribers WHERE article_id = ?)",artID, function(err,userlist){
 			if(err){console.log(err);}
@@ -119,7 +123,6 @@ app.get("/article/:id", function(req,res){
 				res.render("show.ejs", {articles: thisArt, allUsers: userlist, info: author, content: markedContent});
 			});
 		});
-		
 	});
 });
 
@@ -223,25 +226,36 @@ app.get("/article/:id/history", function(req,res){
 	var articleID = parseInt(req.params.id);
 
 	//info to be displayed on page
-	db.all("SELECT users.name, users.id, co_authors.comment, co_authors.updated_at FROM co_authors INNER JOIN users ON co_authors.user_id = users.id WHERE co_authors.article_id = " + articleID, function(err,userData){
+	db.all("SELECT users.name, users.id, co_authors.comment, co_authors.updated_at, co_authors.id, co_authors.article_id FROM co_authors INNER JOIN users ON co_authors.user_id = users.id WHERE co_authors.article_id = " + articleID, function(err,userData){
 		if(err){console.log(err);}
 		// console.log(userData);
 
 		//get article title, this one never get edited
 		db.all("SELECT title, id FROM articles WHERE id = " + articleID, function(err, artData){
 			if(err){console.log(err);}
-			// console.log(artData);
+			console.log(artData);
 			res.render("history.ejs", {allUsers: userData, articles: artData});
 		});
 	});
 });
 
-// //go to individual history
-// app.get("/article/:id/history/:v_id", function(req,res){
-// 	var articleID = parseInt(req.params.article_id);
-// 	var versionID = parseInt(req.params.id);
-// 	db.all("SELECT ")
-// });
+//go to individual history
+app.get("/article/:a_id/history/:v_id", function(req,res){
+	var articleID = parseInt(req.params.a_id);
+	var versionID = parseInt(req.params.v_id);
+	db.all("SELECT * FROM co_authors WHERE article_id = ? AND updated_at = ? ;", articleID, versionID, function(err,version){
+		if(err){console.log(err);}
+		db.get("SELECT title FROM articles WHERE id = ?;", articleID, function(err,title){
+			if(err){console.log(err);}
+			db.get("SELECT users.name FROM users INNER JOIN co_authors ON co_authors.user_id = users.id WHERE updated_at = " + versionID, function(err,author){
+				if(err){console.log(err);}
+			})
+
+			var markedContent = marked(version.content);
+			res.render("version.ejs", {allversion: version, content: markedContent, info: title, co_author: author});
+		});
+	})
+});
 
 //go to user setup page
 app.get("/user/new", function(req,res){

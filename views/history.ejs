@@ -65,7 +65,7 @@
 		<% allUsers.forEach(function(obj){ %>
 			<td class="one"><a href="/user/<%= obj.user_id%>"><%= obj.name %></a></td>
 			<td class="two"><%= obj.comment %></a></td>
-			<td class="three"><a href="/article/<%= articles.article_id %>/history/<%= obj.id %>"><%= obj.updated_at %></a></td>
+			<td class="three"><%= obj.updated_at %></td>
 		</tr>
 		<% }); %>
 

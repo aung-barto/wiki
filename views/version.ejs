@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<link rel="stylesheet"  type="text/css" href="/style.css" >
+	<title><%= info.title %></title>
+	<nav>
+	<a href="/wiki">Home</a>
+	<a href="/article/new">Create New Article</a>
+	<a href="/user/new">Create New User</a>
+	</nav>
+	<h1>Wikifoodies</h1>
+</head>
+<body>
+	<h2><%= info.title %></h2><br>
+
+		<div id="author">
+			<a href="/user/<%= co_author.id %>">By: <%= co_author.name %></a>
+			<a href="/article/<%=version.article_id %>/history"><%= version.create_at %></a>
+		</div>
+		<div class="edit">
+			<a href="/article/<%= version.article_id %>/edit">Edit Article</a>
+		</div>
+		
+		<img src="<%= version.image %>">
+		<%- content %>
+</body>
+</html>
