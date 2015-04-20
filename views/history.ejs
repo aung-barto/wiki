@@ -33,6 +33,21 @@
 	.three{
 		margin-left: 100px;
 	}
+	table{
+		width:65%;
+	}
+	td {
+		height: 25px;
+	}
+	.one{
+		width:20%;
+	}
+	.two{
+		width:20%;
+	}
+	.three{
+		width:20%;
+	}
 
 	</style>
 
@@ -40,16 +55,22 @@
 <body>
 	<h2><%= artObj.title %></h2>
 	<% }); %>
-	<div class="list">
-		<p class="one">usernames</p>
-		<p class="two">comments</p>
-		<p class="three">time</p>
-	</div></br></br>
-	<% allUsers.forEach(function(obj){ %>
-		<p class="one"><a href="/user/<%= obj.user_id%>"><%= obj.name %></a></p>
-		<p class="two"><%= obj.comment %></p></li>
-		<p class="three"><a href="/article/<%= articles.article_id %>/<%= obj.id %>"><%= obj.updated_at %></a></p></br></br>
-	<% }); %>
+	<table>
+		<tr>
+			<td class="one">Usernames</td>
+			<td class="two">Comments</td>
+			<td class="three">Time</td>
+		</tr>				
+		<tr>
+		<% allUsers.forEach(function(obj){ %>
+			<td class="one"><a href="/user/<%= obj.user_id%>"><%= obj.name %></a></td>
+			<td class="two"><%= obj.comment %></a></td>
+			<td class="three"><a href="/article/<%= articles.article_id %>/<%= obj.id %>"><%= obj.updated_at %></a></td>
+		</tr>
+		<% }); %>
+
+	</table>
+	
 	
 </body>
 </html>
