@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
+	<link rel="stylesheet"  type="text/css" href="/style.css" >
 	<title><%= users.name %></title>
 	<nav>
 	<a href="/wiki">Home</a>
@@ -20,6 +21,7 @@
 		<% authors.forEach(function(obj){ %>
 		<a href="/article/<%= obj.id %>"><%= obj.title %></a>
 		<% }); %>
+
 
 		<h4>Contributions:</h4>
 		<% co_authors.forEach(function(coObj){ %>

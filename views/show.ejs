@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
+	<link rel="stylesheet"  type="text/css" href="/style.css" >
 	<title><%= info.title %></title>
 	<nav>
 	<a href="/wiki">Home</a>
@@ -9,6 +10,7 @@
 	<a href="/user/new">Create New User</a>
 	</nav>
 	<h1>Wikifoodies</h1>
+	<!--
 	<style>
 	img {
 		height:375px;
@@ -21,7 +23,13 @@
 		text-align: right;
 		padding-right: 50px;
 	}
+	a:link{
+		text-decoration: none;
+		font-size: small;
+	}
 	body{
+		font-family: Helvetica;
+		font-size: 14px;
 		padding-left: 50px;
 	}
 	.content{
@@ -32,15 +40,17 @@
 		padding: 10px 50px 10px 10px;
 	}
 	#footer{
+		font-size: 12px;
 		display: inline;
 	}
 	</style>
+	-->
 </head>
 <body>
 	<h2><%= info.title %></h2><br>
 
 		<div id="author">
-			<a href="/user/<%= info.id %>"><%= info.name %></a>
+			<a href="/user/<%= info.id %>">By: <%= info.name %></a>
 			<a href="/article/<%=articles.id %>/history"><%= articles.create_at %></a>
 		</div>
 		<div class="edit">
@@ -59,7 +69,7 @@
 				<% }); %>
 			</select>
 			<button>Subscribe To This Article</button>
-		</form>
+		</form><br>
 		
 		<form method="POST" action="/article/<%=articles.id %>?_method=DELETE">
 			<input type="checkbox" name="delete" value="delete" required>Confirm</input>

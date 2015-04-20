@@ -3,39 +3,60 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Wikifoodies</title>
+	<div id=headlinks>
 	<a href="/article/new">Create New Article</a>
-	<a href="/user/new">Create New User</a>
+	<a href="/user/new">Create New User</a><br><br>
+	</div>
 	<form method="POST" action="/wiki/search">
 		<input type="text" name="title" placeholder="Search by title" required>
 		<button>Search</button>
 	</form>
 	<h1>Wikifoodies</h1>
+	<p>...................................................................................................................................................................................................................................................</p>
 	<style>
+
 	img {
 		height:375px;
 		width: auto;
 	}
 	body{
+		font-family: helvetica;
+		font-size:14px;
 		padding-left: 50px;
+	}
+	#toplinks {
+		display: inline;
+		list-style: none;
+		font-size: 12px;
+	}
+	a:link{
+		text-decoration: none;
+		padding: 0px 20px 0px 0px;
+	}
+	#headlinks{
+		font-size: 14px;
+		color: red;
 	}
 	</style>
 </head>
 <body> 
 	<% articles.forEach(function(art_obj){ %>
 		<h2><%= art_obj.title %></h2>
-
-		<% authors.forEach(function(aut_obj){ %>
-			<% if(art_obj.author_id === aut_obj.id){ %>
-				<a href="/user/<%= aut_obj.id %>">By: <%= aut_obj.name %></a> 
-			<% } %>
-		<% }); %>		
-
-		<p><%= art_obj.create_at %></p>
+		<div id=toplinks>
+			<% authors.forEach(function(aut_obj){ %>
+				<% if(art_obj.author_id === aut_obj.id){ %>
+					<a href="/user/<%= aut_obj.id %>">By: <%= aut_obj.name %></a>
+				<% } %>
+			<% }); %>		
+			
+			<p><%= art_obj.create_at %></p>
+		</div>
 		<img src="<%= art_obj.image %>">
 		<%- art_obj.content.substring(0,100) %>
 		 
+		<a href="/article/<%= art_obj.id %>">Read More</a><br><br>
+	<p>...................................................................................................................................................................................................................................................</p>
 
-		<a href="/article/<%= art_obj.id %>">Read More</a>
 	<% }); %>
 </body>
 </html>
