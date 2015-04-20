@@ -50,28 +50,29 @@
 	}
 
 	</style>
-
 </head>
 <body>
 	<h2><%= artObj.title %></h2>
-	<% }); %>
 	<table>
 		<tr>
 			<td class="one">Usernames</td>
 			<td class="two">Comments</td>
 			<td class="three">Time</td>
-		</tr>				
+		</tr>
+		<tr>
+			<td class="one"><a href="/user/<%= artObj.author_id %>"><%= author.name %></a></td>
+			<td class="two">First Version</td>
+			<td class="three"><a href="/article/<%= articles.id %>/history/1"><%= artObj.create_at %></a></td>
+		</tr>
+	<% }); %>				
 		<tr>
 		<% allUsers.forEach(function(obj){ %>
-			<td class="one"><a href="/user/<%= obj.user_id%>"><%= obj.name %></a></td>
+			<td class="one"><a href="/user/<%= obj.id%>"><%= obj.name %></a></td>
 			<td class="two"><%= obj.comment %></a></td>
-			<td class="three"><%= obj.updated_at %></td>
+			<td class="three"><a href="/article/<%= obj.article_id %>/history/<%= obj.id %>"><%= obj.updated_at %></a></td>
 		</tr>
-		<% }); %>
-
+	<% }); %>
 	</table>
-	
-	
 </body>
 </html>
 		

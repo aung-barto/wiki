@@ -8,21 +8,19 @@
 	<a href="/wiki">Home</a>
 	<a href="/article/new">Create New Article</a>
 	<a href="/user/new">Create New User</a>
+	<a href="/article/<%= info.id %>">Go To Latest Version of This Article</a>
 	</nav>
 	<h1>Wikifoodies</h1>
 </head>
 <body>
 	<h2><%= info.title %></h2><br>
-
+	<% allVersion.forEach(function(obj){ %>
 		<div id="author">
 			<a href="/user/<%= co_author.id %>">By: <%= co_author.name %></a>
-			<a href="/article/<%=version.article_id %>/history"><%= version.create_at %></a>
+			<p><%= obj.updated_at %></p>
 		</div>
-		<div class="edit">
-			<a href="/article/<%= version.article_id %>/edit">Edit Article</a>
-		</div>
-		
-		<img src="<%= version.image %>">
-		<%- content %>
+		<img src="<%= obj.image %>">
+		<p><%- obj.content %></p>
+		<% }); %>
 </body>
 </html>
