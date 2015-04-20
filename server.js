@@ -45,7 +45,7 @@ app.get("/wiki", function(req,res){
 			data1.map(function(obj) {
                 obj.content = marked(obj.content);
             });
-            console.log(data1);
+            // console.log(data1);
 			var all_articles = data1.reverse();
 			// console.log(data);
 			db.all("SELECT users.name, users.id FROM users;", function(err,data){
@@ -91,21 +91,24 @@ app.get("/article/:id", function(req,res){
 	db.get("SELECT * FROM articles WHERE id = " + artID, function(err,thisArt){
 		if(err){console.log(err);}
 
-		//turn [[title]] into a link
-		var newContent = [];
-		db.all("SELECT title FROM articles;", function(err,allArt){
-			allArt.forEach(function(article){
-				if(thisArt.content.indexOf("[["+ article.title + "]]") != -1){
-					console.log(article.title);
-					var href = "<a href='/article/" + article.id + "'>";
-					console.log(href);
-					var openLink = thisArt.content.replace(/\[\[/, href);
-					newContent.push(openLink.replace(/\]\]/, "</a>"));
-					console.log(newContent);
-				}
-			});
-		});
-		var markedContent = marked(newContent);
+		// turn [[title]] into a link
+		// var newContent = "";
+		// db.all("SELECT id,title FROM articles;", function(err,allArt){
+		// 	allArt.forEach(function(article){
+		// 		if(thisArt.content.indexOf("[["+ article.title + "]]") != -1){
+		// 			console.log(article.title);
+		// 			var href = "<a href='/article/" + article.id + "'>" + article.title + "</a>";
+		// 			console.log(article.id)
+		// 			console.log(href);
+		// 		}
+		// 			newContent = thisArt.content.replace("[["+ article.title + "]]", href);
+		// 			// console.log(newContent);
+		// 			// newContent.push(openLink.replace(/\]\]/, "</a>"));
+		// 			// console.log(newContent);
+		// 	});
+		// });
+		var markedContent = marked(thisArt.content);
+		// console.log(markedContent);
 
 		//if users have already subscribed to article, do not show their name
 		db.all("SELECT id, name FROM users WHERE id NOT IN (SELECT user_id FROM subscribers WHERE article_id = ?)",artID, function(err,userlist){
@@ -164,7 +167,7 @@ app.get("/article/:id/edit", function(req,res){
 //update article page
 app.put("/article/:id", function(req,res){
 	// console.log(parseInt(req.params.id));
-	// var email = new sendgrid.Email({from: "admin@wikifoodies.com"});
+	
 	db.run("UPDATE articles SET content = ?, image = ? WHERE id = " + parseInt(req.params.id),req.body.content, req.body.image, function(err,data){
 		if(err){console.log(err);}
 
@@ -172,18 +175,26 @@ app.put("/article/:id", function(req,res){
 			if(err){console.log(err);}
 			// console.log(address);
 
+			
 			db.get("SELECT title FROM articles WHERE id = " + parseInt(req.params.id), function(err, artTitle){
 				if(err){console.log(err);}
 				// console.log(artTitle);
+				var addresses = [];
+				for(var i = 0; i < address.length; i ++){
+					addresses.push(address[i].email);
+				}
+				var email = {
+					to: addresses,
+					from: "admin@wikifoodies.com",
+					subject: artTitle.title + " has been updated!",
+					text: "Just a friendly note from our team at Wikifoodies. " + artTitle.title + " article has been updated."
+				}
+				// console.log(email);
 
-				// email.to = address;
-				// email.subject = artTitle + " has been updated!";
-				// email.text = "Just a friendly note from our team at Wikifoodies." + artTitle + " article has been updated.";
-
-				// sendgrid.send(email, function(err, json) {
-  		// 		if (err) { return console.error(err); }
-  		// 		console.log(json);
-				// });
+				sendgrid.send(email, function(err, json) {
+  				if (err) { return console.error(err); }
+  				console.log(json);
+				});
 
 				db.run("INSERT INTO co_authors(article_id, user_id, content, image, comment) VALUES(?,?,?,?,?);", req.body.article_id, req.body.user_id, req.body.content, req.body.image, req.body.comment, function(err,data){
 					if(err){console.log(err);}
