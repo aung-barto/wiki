@@ -65,7 +65,8 @@ app.post("/articles", function(req,res){
 		}else{
 			var id = this.lastID;
 			var artLink = "<a href='/article/"+id+"'>"+req.body.title+"</a>";
-			db.run("INSERT INTO articles (link) VALUES(?);", artLink, function(err,data){
+			//update with link to article
+			db.run("UPDATE articles SET link = ? WHERE id = "+ id, artLink, function(err,data){
 				if(err){console.log(err);}
 				//push new info into co_authors table as a record
 				db.run("INSERT INTO co_authors (article_id, user_id, content, image, comment) VALUES (?,?,?,?,?);", req.body.article_id, req.body.user_id, req.body.content, req.body.image, req.body.comment, function(err,data2){
