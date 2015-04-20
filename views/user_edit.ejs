@@ -24,7 +24,7 @@
 		
 	<form method="POST" action="/user/<%= userInfo.id %>?_method=PUT">
 		<% subInfo.forEach(function(subObj){ %>
-		<input type="checkbox" name="subs" value="<%= subObj.id %>"><%= subObj.title %><br>
+		<input type="checkbox" name="article_id" value="<%= subObj.id %>"><%= subObj.title %><br><br>
 		<% }); %>
 	<button>Submit</button>
 	</form>

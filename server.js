@@ -90,7 +90,7 @@ app.get("/article/:id", function(req,res){
 		// 			console.log(href);
 		// 		}
 		// 			newContent = thisArt.content.replace("[["+ article.title + "]]", href);
-		// 			// console.log(newContent);
+		// 			console.log(newContent);
 		// 			// newContent.push(openLink.replace(/\]\]/, "</a>"));
 		// 			// console.log(newContent);
 		// 	});
@@ -104,9 +104,9 @@ app.get("/article/:id", function(req,res){
 			// console.log(userlist);
 
 			//getting author of the article
-			db.get("SELECT articles.author_id, users.name FROM articles INNER JOIN users ON articles.author_id = users.id WHERE articles.id = " + artID, function(err,author){
+			db.get("SELECT users.id, users.name FROM articles INNER JOIN users ON articles.author_id = users.id WHERE articles.id = " + artID, function(err,author){
 				if(err){console.log(err);}
-				// console.log(author);
+				console.log(author);
 
 				res.render("show.ejs", {articles: thisArt, allUsers: userlist, info: author, content: markedContent});
 			});
@@ -118,28 +118,27 @@ app.get("/article/:id", function(req,res){
 app.post("/article/:id", function(req,res){
 	db.run("INSERT INTO subscribers (article_id, user_id) VALUES (?,?);", parseInt(req.params.id), req.body.username, function(err,number){
 		if(err){console.log(err);}
-		console.log(req.body.username);
+		// console.log(req.body.username);
 		//get user email address
 		db.get("SELECT email FROM users WHERE id = " + req.body.username, function(err,userEmail){
 			if(err){console.log(err);}
-			console.log(userEmail);
+			// console.log(userEmail);
 
 			//get article title
 			db.get("SELECT title FROM articles WHERE id = " + parseInt(req.params.id), function(err,title){
 				if (err){console.log(err);}
-				//send email confirmation for subscription
-				var email = {
-				  to      : userEmail.email,
-				  from    : "admin@wikifoodies.com",
-				  subject : "Thank You For Your Subscription!",
-				  text    : "You have subscribed to " + title.title + "'s article. You will receive updates when someone edited or made changes to this article.\n\n Thanks for your support,\n
-				  WikiFoodies Team"
-				}
-				console.log(email);
-				sendgrid.send(email, function(err, json) {
-				  if (err) { console.error(err); }
-				  console.log(json);
-				});
+//////////////////send email confirmation for subscription////////////////////////////
+				// var email = {
+				//   to      : userEmail.email,
+				//   from    : "admin@wikifoodies.com",
+				//   subject : "Thank You For Your Subscription!",
+				//   text    : "You have subscribed to " + title.title + "'s article. You will receive updates when someone edited or made changes to this article.\n\n Thanks for your support,\n
+				//   WikiFoodies Team"
+				// }
+				// sendgrid.send(email, function(err, json) {
+				//   if (err) { console.error(err); }
+				//   console.log(json);
+				// });
 			});
 		});
 		res.redirect("/article/" + parseInt(req.params.id));
@@ -180,27 +179,26 @@ app.put("/article/:id", function(req,res){
 		db.all("SELECT users.email FROM users INNER JOIN subscribers ON users.id = subscribers.user_id WHERE subscribers.article_id = " + parseInt(req.params.id), function(err,address){
 			if(err){console.log(err);}
 			// console.log(address);
-
 			
 			db.get("SELECT title FROM articles WHERE id = " + parseInt(req.params.id), function(err, artTitle){
 				if(err){console.log(err);}
 				// console.log(artTitle);
-				var addresses = [];
-				for(var i = 0; i < address.length; i ++){
-					addresses.push(address[i].email);
-				}
-				var email = {
-					to: addresses,
-					from: "admin@wikifoodies.com",
-					subject: artTitle.title + " has been updated!",
-					text: "Just a friendly note from our team at Wikifoodies. " + artTitle.title + "'s article has been updated.\n\n\nHave a Great Day From WikiFoodies Team"
-				}
-				// console.log(email);
 
-				sendgrid.send(email, function(err, json) {
-  				if (err) { return console.error(err); }
-  				console.log(json);
-				});
+//////////////////send email when article is updated//////////////////////////////////
+				// var addresses = [];
+				// for(var i = 0; i < address.length; i ++){
+				// 	addresses.push(address[i].email);
+				// }
+				// var email = {
+				// 	to: addresses,
+				// 	from: "admin@wikifoodies.com",
+				// 	subject: artTitle.title + " has been updated!",
+				// 	text: "Just a friendly note from our team at Wikifoodies. " + artTitle.title + "'s article has been updated.\n\n\nHave a Great Day From WikiFoodies Team"
+				// }
+				// sendgrid.send(email, function(err, json) {
+  		// 		if (err) { return console.error(err); }
+  		// 		console.log(json);
+				// });
 
 				db.run("INSERT INTO co_authors(article_id, user_id, content, image, comment) VALUES(?,?,?,?,?);", req.body.article_id, req.body.user_id, req.body.content, req.body.image, req.body.comment, function(err,data){
 					if(err){console.log(err);}
@@ -260,7 +258,7 @@ app.get("/user/:id", function(req,res){
 				// console.log(thisCoAut); 
 
 				//get subscribed articles
-				db.all("SELECT DISTINCT articles.id, articles.title FROM articles INNER JOIN subscribers ON articles.id = subscribers.article_id WHERE subscribers.user_id = " + userID, function(err,thisSub){
+				db.all("SELECT articles.id, articles.title FROM articles INNER JOIN subscribers ON articles.id = subscribers.article_id WHERE subscribers.user_id = " + userID, function(err,thisSub){
 					// console.log(thisSub);
 				res.render("user.ejs", {users: thisUser, authors: thisAuthor, co_authors: thisCoAut, subscribers: thisSub});
 				});
@@ -287,10 +285,13 @@ app.get("/user/:id/edit", function(req,res){
 
 //update user page
 app.put("/user/:id", function(req,res){
-	db.run("UPDATE subscribers SET article_id = ? WHERE user_id = " + parseInt(req.params.id), req.body.articles_id, function(err,data){
+	db.run("UPDATE users SET name = ?, email = ?, location = ? WHERE id = " + parseInt(req.params.id), req.body.name, req.body.email, req.body.location, function(err,dataU){
 		if(err){console.log(err);}
-		db.run("UPDATE users SET name = ?, email = ?, location = ? WHERE id = " + parseInt(req.params.id), req.body.name, req.body.email, req.body.location, function(err,data){
+
+		//remove unsubscribed article and id from list
+		db.run("DELETE FROM subscribers WHERE user_id = ? AND article_id = ?", parseInt(req.params.id), req.body.article_id, function(err,dataD){
 			if(err){console.log(err);}
+			
 			res.redirect("/user/" + parseInt(req.params.id));
 		});
 	});
