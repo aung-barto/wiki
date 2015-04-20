@@ -88,6 +88,22 @@ app.get("/article/:id", function(req,res){
 		// console.log(thisArt);
 		var markedContent = "";
 
+			if(thisArt.content.indexOf("[[")!= -1){
+		// turn [[title]] into a link
+			db.all("SELECT id,title,link FROM articles;", function(err,allArt){
+				console.log("93 "+thisArt.content.indexOf("[["));
+
+				for (var i = 0; i < allArt.length; i++){	
+					console.log(thisArt.content.indexOf("[["+ allArt[i].title+"]]"));
+					if(thisArt.content.indexOf("[["+ allArt[i].title + "]]")!=-1){
+						newContent.push(thisArt.content.replace("[["+ allArt[i].title + "]]", allArt[i].link));
+					}
+				} 
+				// var joined = newContent.join("");
+				markedContent = marked(newContent[newContent.length-1]);
+			});	
+
+
 		// if(thisArt.content.indexOf("[[")!= -1){
 		// // turn [[title]] into a link
 		// 	db.all("SELECT id,title,link FROM articles;", function(err,allArt){
@@ -107,9 +123,9 @@ app.get("/article/:id", function(req,res){
 		// 	});
 			
 
-		// }else {
+		}else {
 			markedContent = marked(thisArt.content);
-		// }
+		}
 		//if users have already subscribed to article, do not show their name
 		db.all("SELECT id, name FROM users WHERE id NOT IN (SELECT user_id FROM subscribers WHERE article_id = ?)",artID, function(err,userlist){
 			if(err){console.log(err);}
@@ -140,18 +156,17 @@ app.post("/article/:id", function(req,res){
 			db.get("SELECT title FROM articles WHERE id = " + parseInt(req.params.id), function(err,title){
 				if (err){console.log(err);}
 //////////////////send email confirmation for subscription////////////////////////////
-				// var email = {
-				//   to      : userEmail.email,
-				//   from    : "admin@wikifoodies.com",
-				//   subject : "Thank You For Your Subscription!",
-				//   text    : "You have subscribed to " + title.title + "'s article. You will receive updates when someone edited or made changes to this article.\n\n Thanks for your support,\n
-				//   WikiFoodies Team"
-				// }
-				// sendgrid.send(email, function(err, json) {
-				//   if (err) { console.error(err); }
-				//   console.log(json);
-				// });
-		});
+				var email = {
+				  to      : userEmail.email,
+				  from    : "admin@wikifoodies.com",
+				  subject : "Thank You For Your Subscription!",
+				  text    : "You have subscribed to " + title.title + " article."
+				}
+				sendgrid.send(email, function(err, json) {
+				  if (err) { console.error(err); }
+				  console.log(json);
+				});
+			});
 		});
 		res.redirect("/article/" + parseInt(req.params.id));
 	});
@@ -197,20 +212,20 @@ app.put("/article/:id", function(req,res){
 				// console.log(artTitle);
 
 //////////////////send email when article is updated//////////////////////////////////
-				// var addresses = [];
-				// for(var i = 0; i < address.length; i ++){
-				// 	addresses.push(address[i].email);
-				// }
-				// var email = {
-				// 	to: addresses,
-				// 	from: "admin@wikifoodies.com",
-				// 	subject: artTitle.title + " has been updated!",
-				// 	text: "Just a friendly note from our team at Wikifoodies. " + artTitle.title + "'s article has been updated.\n\n\nHave a Great Day From WikiFoodies Team"
-				// }
-				// sendgrid.send(email, function(err, json) {
-  		// 		if (err) { return console.error(err); }
-  		// 		console.log(json);
-				// });
+				var addresses = [];
+				for(var i = 0; i < address.length; i ++){
+					addresses.push(address[i].email);
+				}
+				var email = {
+					to: addresses,
+					from: "admin@wikifoodies.com",
+					subject: artTitle.title + " has been updated!",
+					text: "Just a friendly note from our team at Wikifoodies. " + artTitle.title + "'s article has been updated.\n\n\nHave a Great Day From WikiFoodies Team"
+				}
+				sendgrid.send(email, function(err, json) {
+  				if (err) { return console.error(err); }
+  				console.log(json);
+				});
 
 			db.run("INSERT INTO co_authors(article_id, user_id, content, image, comment) VALUES(?,?,?,?,?);", req.body.article_id, req.body.user_id, req.body.content, req.body.image, req.body.comment, function(err,data){
 				if(err){console.log(err);}
