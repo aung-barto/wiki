@@ -39,7 +39,14 @@ app.get("/wiki", function(req,res){
 				}else{
 					var all_authors = data.reverse();
 				}
-				res.render("index.ejs", {articles: all_articles, authors: all_authors});
+				//updated articles
+				db.all("SELECT * FROM co_authors LEFT OUTER JOIN articles ON co_authors.article_id = articles.id LEFT OUTER JOIN users ON co_authors.user_id = users.id WHERE co_authors.updated_at >= datetime('now','-0.5 day') ORDER BY updated_at DESC;",function(err,allEvents){
+					if(err){console.log(err);}
+					db.all("SELECT users.name, articles.id, articles.title, articles.create_at FROM users INNER JOIN articles ON users.id = articles.author_id WHERE articles.create_at >= datetime('now','-1 day') ORDER BY create_at DESC;",function(err,created){
+						if(err){console.log(err);}
+						res.render("index.ejs", {articles: all_articles, authors: all_authors, events: allEvents, newContent: created});
+					});
+				});
 			});
 		}
 	});

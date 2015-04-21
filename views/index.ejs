@@ -12,17 +12,35 @@
 		<button>Search</button>
 	</form>
 	<h1>Wikifoodies</h1>
-	<p>...................................................................................................................................................................................................................................................</p>
+	<hr size=1>
 	<style>
-
+	h4{
+		text-align: left;
+		padding-left: 38px;
+	}
 	img {
 		height:375px;
 		width: auto;
+	}
+	.time{
+		font-size: 10px;
+	}
+	.events{
+		font-size: 12px;
+		display: block;
+		width: 200px;
+		text-align: left;
+		float: right;
+	}
+	ul{
+		list-style: none;
 	}
 	body{
 		font-family: helvetica;
 		font-size:14px;
 		padding-left: 50px;
+		display: block;
+		max-width: 100%;
 	}
 	#toplinks {
 		display: inline;
@@ -40,6 +58,22 @@
 	</style>
 </head>
 <body> 
+	<div class="events">
+		<h4>Updated Articles</h4>
+			<ul id="update">
+				<% events.forEach(function(eventObj){ %>
+					<li><a href="/article/<%=eventObj.article_id%>"><%=eventObj.title %></a></li>
+					<li class="time"><%=eventObj.updated_at %></li><br>
+				<% }); %>
+			</ul>
+		<h4>New Articles</h4>
+			<ul id="new">
+				<% newContent.forEach(function(newObj){ %>
+					<li><a href="/article/<%=newObj.id%>"><%=newObj.title %></a></li>
+					<li class="time"><%=newObj.create_at %></li><br>
+				<% }); %>
+			</ul>
+	</div>
 	<% articles.forEach(function(art_obj){ %>
 		<h2><%= art_obj.title %></h2>
 		<div id=toplinks>
@@ -48,15 +82,12 @@
 					<a href="/user/<%= aut_obj.id %>">By: <%= aut_obj.name %></a>
 				<% } %>
 			<% }); %>		
-			
 			<p><%= art_obj.create_at %></p>
 		</div>
 		<img src="<%= art_obj.image %>">
 		<%- art_obj.content.substring(0,100) %>
-		 
 		<a href="/article/<%= art_obj.id %>">Read More</a><br><br>
-	<p>...................................................................................................................................................................................................................................................</p>
-
+	<hr size=1>
 	<% }); %>
 </body>
 </html>
