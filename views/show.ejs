@@ -5,15 +5,14 @@
 	<link rel="stylesheet"  type="text/css" href="/style.css" >
 	<title><%= info.title %></title>
 	<nav>
-	<a href="/wiki">Home</a>
-	<a href="/article/new">Create New Article</a>
-	<a href="/user/new">Create New User</a>
+		<a href="/wiki">Home</a>
+		<a href="/article/new">Create New Article</a>
+		<a href="/user/new">Create New User</a>
 	</nav>
 	<h1>Wikifoodies</h1>
 </head>
 <body>
 	<h2><%= info.title %></h2><br>
-
 		<div id="author">
 			<a href="/user/<%= info.id %>">By: <%= info.name %></a>
 			<a href="/article/<%=articles.id %>/history"><%= articles.create_at %></a>
@@ -21,25 +20,23 @@
 		<div class="edit">
 			<a href="/article/<%= articles.id %>/edit">Edit Article</a>
 		</div>
-		
 		<img src="<%= articles.image %>">
 		<%- content %>
-		
 		<div id="footer">
-		<form method="POST" action="/article/<%= articles.id %>">
-		<label>Choose Your Username</label>
-			<select name="username">
-			<% allUsers.forEach(function(name){ %>
-				<option value="<%= name.id %>"><%= name.name %></option>
-				<% }); %>
-			</select>
-			<button>Subscribe To This Article</button>
-		</form><br>
-		
-		<form method="POST" action="/article/<%=articles.id %>?_method=DELETE">
-			<input type="checkbox" name="delete" value="delete" required>Confirm</input>
-		<button>Delete Article</button>
-		</form>
+			<form method="POST" action="/article/<%= articles.id %>">
+				<label>Choose Your Username</label>
+					<select name="username">
+					<% allUsers.forEach(function(name){ %>
+						<option value="<%= name.id %>"><%= name.name %></option>
+						<% }); %>
+					</select>
+				<button>Subscribe To This Article</button>
+			</form><br>
+			
+			<form method="POST" action="/article/<%=articles.id %>?_method=DELETE">
+				<input type="checkbox" name="delete" value="delete" required>Confirm</input>
+				<button>Delete Article</button>
+			</form>
 		</div>
 </body>
 </html>
