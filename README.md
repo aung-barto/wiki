@@ -14,8 +14,10 @@ or choosing a pre-existing one from a drop-down menu
 * A user can see a history of changes for a document
 * A wiki document should always be written using markdown format
 
+Link to Trello Page: https://trello.com/b/iCBFRw9N/wiki-project-1-planning
+
 ####How User Navigate The Site
-Link to WikiFoodies 104.236.106.226:3000/wiki
+Link to WikiFoodies http://104.236.106.226:3000/wiki
 
 **Index Page**
 
