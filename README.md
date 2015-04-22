@@ -2,16 +2,16 @@
 
 ####Requirements
 
-A user can create a wiki document
-A user can search for wikis by title (only exact matches need to be supported)
-A user can edit a wiki document (this does not change the original author of the wiki document)
-A user can delete a wiki document
-A user can view an author's page that lists the pages that they have created or edited
-A user can specify an author when creating a wiki document by either creating a new author or choosing a pre-existing one from a drop-down menu
-A user can link to other pages in the wiki by using the syntax [[document-title]]
-A user can subscribe to a document and receive an email when this document is modified (using Sendgrid)
-A user can see a history of changes for a document
-A wiki document should always be written using markdown format
+  *A user can create a wiki document
+  *A user can search for wikis by title (only exact matches need to be supported)
+  *A user can edit a wiki document (this does not change the original author of the wiki document)
+  *A user can delete a wiki document
+  *A user can view an author's page that lists the pages that they have created or edited
+  *A user can specify an author when creating a wiki document by either creating a new author or choosing a pre-existing one from a drop-down menu
+  *A user can link to other pages in the wiki by using the syntax [[document-title]]
+  *A user can subscribe to a document and receive an email when this document is modified (using Sendgrid)
+  *A user can see a history of changes for a document
+  *A wiki document should always be written using markdown format
 
 ####How User Navigate The Site
 Link to WikiFoodies 104.236.106.226:3000/wiki
