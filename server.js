@@ -15,7 +15,7 @@ app.use(express.static("public"));
 var marked = require("marked");
 
 //Sendgrid when an article is updated
-var sendgrid  = require('sendgrid')("Foodies", "WIKIfoodie3");
+var sendgrid  = require('sendgrid')();
 
 //Sendgrid when someone subscribes to an article
 
